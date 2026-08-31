@@ -1,0 +1,6 @@
+{
+  "name": "CineAI Studio - AI Text to Video Creator",
+  "description": "Studio pembuatan video AI canggih dari teks ke video dengan transisi otomatis, efek sinematik, voiceover AI, timeline multi-track, dan rendering video real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
