@@ -428,6 +428,68 @@ export const LiveVideoPlayer: React.FC<LiveVideoPlayerProps> = ({
 
         </div>
 
+        {/* Quick Chapter Selector Ribbon */}
+        <div className="pt-2 border-t border-slate-800/80">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {project.scenes.map((sc, idx) => {
+              // Calculate start time of this scene
+              let startTime = 0;
+              for (let i = 0; i < idx; i++) {
+                startTime += project.scenes[i].duration;
+              }
+              const isCurrent = idx === sceneIndex;
+
+              const getSceneIcon = (type: string) => {
+                switch (type) {
+                  case 'intro': return '🚀';
+                  case 'learning_concept':
+                  case 'concept': return '💡';
+                  case 'explanation': return '📚';
+                  case 'example': return '🔬';
+                  case 'summary': return '📌';
+                  case 'quiz': return '❓';
+                  case 'outro': return '🌟';
+                  default: return '📖';
+                }
+              };
+
+              const getSceneLabel = (type: string) => {
+                switch (type) {
+                  case 'intro': return 'Pembuka';
+                  case 'learning_concept':
+                  case 'concept': return 'Konsep';
+                  case 'explanation': return 'Penjelasan';
+                  case 'example': return 'Contoh';
+                  case 'summary': return 'Rangkuman';
+                  case 'quiz': return 'Kuis';
+                  case 'outro': return 'Penutup';
+                  default: return 'Scene';
+                }
+              };
+
+              return (
+                <button
+                  key={sc.id || idx}
+                  onClick={() => {
+                    seekTo(startTime);
+                    if (onSceneChange) onSceneChange(idx);
+                  }}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                    isCurrent
+                      ? 'bg-indigo-600 text-white ring-1 ring-indigo-400 shadow-md shadow-indigo-600/30'
+                      : 'bg-slate-800/70 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                  }`}
+                  title={`${sc.title} (${sc.duration}s)`}
+                >
+                  <span>{getSceneIcon(sc.sceneType)}</span>
+                  <span>{idx + 1}. {getSceneLabel(sc.sceneType)}</span>
+                  <span className="text-[10px] opacity-60">({sc.duration}s)</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
 
     </div>

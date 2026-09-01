@@ -32,13 +32,14 @@ export function App() {
   const [hasApiKey, setHasApiKey] = useState<boolean>(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   
-  // App Access Authentication Gate
+  // App Access Authentication Gate (Enabled by default to show working application directly)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
-      const saved = localStorage.getItem('eduvideo_auth_session');
-      return !!saved;
+      const loggedOut = localStorage.getItem('eduvideo_auth_logged_out');
+      if (loggedOut === 'true') return false;
+      return true;
     } catch {
-      return false;
+      return true;
     }
   });
 

@@ -123,50 +123,8 @@ export function drawSceneFrame(ctx: CanvasRenderingContext2D, options: DrawScene
   ctx.fillStyle = overlayGrad;
   ctx.fillRect(0, 0, width, height);
 
-  // 3. Draw Header Badges (Scene Type & Watermark)
-  ctx.save();
-  const pillX = width * 0.05;
-  const pillY = height * 0.05;
-  const pillPaddingX = 14;
-
-  let sceneTypeName = '📖 01. PENGANTAR MATERI';
-  let pillColor = '#6366F1';
-  if (scene.sceneType === 'intro') {
-    sceneTypeName = '🚀 01. INTRO & APERSEPSI';
-    pillColor = '#6366F1';
-  } else if (scene.sceneType === 'concept' || scene.sceneType === 'learning_concept') {
-    sceneTypeName = '💡 02. KONSEP UTAMA';
-    pillColor = '#8B5CF6';
-  } else if (scene.sceneType === 'explanation') {
-    sceneTypeName = '📚 03. PENJELASAN MENDALAM';
-    pillColor = '#06B6D4';
-  } else if (scene.sceneType === 'example') {
-    sceneTypeName = '🔬 04. CONTOH & APLIKASI NYATA';
-    pillColor = '#10B981';
-  } else if (scene.sceneType === 'summary') {
-    sceneTypeName = '📌 05. RANGKUMAN KESIMPULAN';
-    pillColor = '#F59E0B';
-  } else if (scene.sceneType === 'quiz') {
-    sceneTypeName = '❓ 06. KUIS EVALUASI INTERAKTIF';
-    pillColor = '#EC4899';
-  } else if (scene.sceneType === 'outro') {
-    sceneTypeName = '🌟 07. PENUTUP & REFLEKSI';
-    pillColor = '#14B8A6';
-  }
-
-  // Draw Scene Type Pill
-  ctx.font = `bold ${Math.round(height * 0.024)}px 'Outfit', sans-serif`;
-  const textWidth = ctx.measureText(sceneTypeName).width;
-  ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-  ctx.beginPath();
-  ctx.roundRect(pillX, pillY, textWidth + pillPaddingX * 2, height * 0.048, 8);
-  ctx.fill();
-  ctx.strokeStyle = pillColor;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(sceneTypeName, pillX + pillPaddingX, pillY + height * 0.033);
+  // 3. Draw Header Badges & Chapter Stepper
+  drawChapterStepper(ctx, project, scene, width, height);
 
   // Watermark / Subject Badge on top right
   if (project.exportSettings?.watermark) {
@@ -174,9 +132,9 @@ export function drawSceneFrame(ctx: CanvasRenderingContext2D, options: DrawScene
     ctx.font = `600 ${Math.round(height * 0.022)}px 'Plus Jakarta Sans', sans-serif`;
     const wmWidth = ctx.measureText(wmText).width;
     const wmX = width - wmXPos(width, wmWidth);
-    const wmY = height * 0.05;
+    const wmY = height * 0.045;
 
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
     ctx.beginPath();
     ctx.roundRect(wmX - 12, wmY, wmWidth + 24, height * 0.044, 8);
     ctx.fill();
@@ -187,7 +145,9 @@ export function drawSceneFrame(ctx: CanvasRenderingContext2D, options: DrawScene
     ctx.fillStyle = '#E2E8F0';
     ctx.fillText(wmText, wmX, wmY + height * 0.03);
   }
-  ctx.restore();
+
+  // Draw Floating Subject-Themed Animated Particles
+  drawSubjectThemedParticles(ctx, project.subject, width, height, sceneTime);
 
   // 4. Main Scene Content based on type
   if (scene.sceneType === 'intro') {
@@ -196,6 +156,14 @@ export function drawSceneFrame(ctx: CanvasRenderingContext2D, options: DrawScene
     drawInteractiveOutroScene(ctx, scene, width, height, sceneTime, project);
   } else if (scene.sceneType === 'quiz' && scene.quizQuestion) {
     drawQuizScene(ctx, scene, width, height, sceneTime, interactiveQuizSelected);
+  } else if (scene.sceneType === 'concept' || scene.sceneType === 'learning_concept') {
+    drawConceptScene(ctx, scene, width, height, sceneTime, project);
+  } else if (scene.sceneType === 'explanation') {
+    drawExplanationScene(ctx, scene, width, height, sceneTime, project);
+  } else if (scene.sceneType === 'example') {
+    drawExampleScene(ctx, scene, width, height, sceneTime, project);
+  } else if (scene.sceneType === 'summary') {
+    drawSummaryScene(ctx, scene, width, height, sceneTime, project);
   } else {
     drawStandardScene(ctx, scene, width, height, sceneTime, project);
   }
@@ -604,7 +572,793 @@ function drawInteractiveOutroScene(
 }
 
 // -------------------------------------------------------------
-// STANDARD SCENE (CONCEPT / EXPLANATION / SUMMARY)
+// CHAPTER STEPPER & TOP HEADER
+// -------------------------------------------------------------
+function drawChapterStepper(
+  ctx: CanvasRenderingContext2D,
+  project: VideoProject,
+  scene: Scene,
+  width: number,
+  height: number
+) {
+  ctx.save();
+  const pillX = width * 0.04;
+  const pillY = height * 0.045;
+  const pillPaddingX = 14;
+
+  let sceneTypeName = '📖 01. PENGANTAR';
+  let pillColor = '#6366F1';
+  let chapterIndex = 0;
+
+  if (scene.sceneType === 'intro') {
+    sceneTypeName = '🚀 01. INTRO & APERSEPSI';
+    pillColor = '#6366F1';
+    chapterIndex = 0;
+  } else if (scene.sceneType === 'concept' || scene.sceneType === 'learning_concept') {
+    sceneTypeName = '💡 02. KONSEP UTAMA';
+    pillColor = '#8B5CF6';
+    chapterIndex = 1;
+  } else if (scene.sceneType === 'explanation') {
+    sceneTypeName = '📚 03. PENJELASAN MENDALAM';
+    pillColor = '#06B6D4';
+    chapterIndex = 2;
+  } else if (scene.sceneType === 'example') {
+    sceneTypeName = '🔬 04. CONTOH & PRAKTIK NYATA';
+    pillColor = '#10B981';
+    chapterIndex = 3;
+  } else if (scene.sceneType === 'summary') {
+    sceneTypeName = '📌 05. RANGKUMAN KESIMPULAN';
+    pillColor = '#F59E0B';
+    chapterIndex = 4;
+  } else if (scene.sceneType === 'quiz') {
+    sceneTypeName = '❓ 06. KUIS EVALUASI INTERAKTIF';
+    pillColor = '#EC4899';
+    chapterIndex = 5;
+  } else if (scene.sceneType === 'outro') {
+    sceneTypeName = '🌟 07. PENUTUP & REFLEKSI';
+    pillColor = '#14B8A6';
+    chapterIndex = 6;
+  }
+
+  // Draw Scene Type Pill
+  ctx.font = `bold ${Math.round(height * 0.023)}px 'Outfit', sans-serif`;
+  const textWidth = ctx.measureText(sceneTypeName).width;
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+  ctx.beginPath();
+  ctx.roundRect(pillX, pillY, textWidth + pillPaddingX * 2, height * 0.044, 8);
+  ctx.fill();
+  ctx.strokeStyle = pillColor;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(sceneTypeName, pillX + pillPaddingX, pillY + height * 0.030);
+
+  // Mini Chapter Pipeline Indicators (7 steps)
+  const dotStartX = pillX + textWidth + pillPaddingX * 2 + 14;
+  const dotY = pillY + height * 0.022;
+  const totalSteps = 7;
+  const stepGap = 16;
+
+  for (let i = 0; i < totalSteps; i++) {
+    const dX = dotStartX + i * stepGap;
+    const isPast = i < chapterIndex;
+    const isCurrent = i === chapterIndex;
+
+    ctx.beginPath();
+    ctx.arc(dX, dotY, isCurrent ? 5.5 : 3.5, 0, Math.PI * 2);
+    if (isCurrent) {
+      ctx.fillStyle = pillColor;
+      ctx.shadowColor = pillColor;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    } else if (isPast) {
+      ctx.fillStyle = '#10B981';
+      ctx.fill();
+    } else {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.fill();
+    }
+
+    if (i < totalSteps - 1) {
+      ctx.strokeStyle = isPast ? '#10B981' : 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(dX + (isCurrent ? 6 : 4), dotY);
+      ctx.lineTo(dX + stepGap - 4, dotY);
+      ctx.stroke();
+    }
+  }
+
+  ctx.restore();
+}
+
+// -------------------------------------------------------------
+// SUBJECT THEMED FLOATING PARTICLES
+// -------------------------------------------------------------
+function drawSubjectThemedParticles(
+  ctx: CanvasRenderingContext2D,
+  subject: string,
+  width: number,
+  height: number,
+  sceneTime: number
+) {
+  ctx.save();
+  const isIslam = ['Fikih', 'Akidah Akhlak', "Al-Qur'an Hadis", 'SKI', 'Bahasa Arab'].includes(subject);
+  const isMath = ['Matematika', 'Fisika'].includes(subject);
+  const isScience = ['IPAS', 'IPA', 'Biologi', 'Kimia'].includes(subject);
+
+  const symbols = isIslam
+    ? ['☪', '★', '✧', '✦', '📖']
+    : isMath
+    ? ['π', '∑', '√', '∞', '+', '÷']
+    : isScience
+    ? ['⚛', '🔬', '🌱', '💧', '⚡', '☀️']
+    : ['✨', '📚', '💡', '🎓', '★'];
+
+  ctx.font = `${Math.round(height * 0.024)}px sans-serif`;
+  ctx.textAlign = 'center';
+
+  for (let i = 0; i < 8; i++) {
+    const sym = symbols[i % symbols.length];
+    const pX = ((Math.sin(i * 3.7 + sceneTime * 0.4) * 0.5 + 0.5) * (width * 0.9)) + width * 0.05;
+    const pY = ((Math.cos(i * 2.1 + sceneTime * 0.3) * 0.5 + 0.5) * (height * 0.8)) + height * 0.1;
+    const pAlpha = (Math.sin(sceneTime * 2 + i) * 0.5 + 0.5) * 0.35 + 0.1;
+
+    ctx.fillStyle = `rgba(255, 255, 255, ${pAlpha})`;
+    ctx.fillText(sym, pX, pY);
+  }
+  ctx.restore();
+}
+
+// -------------------------------------------------------------
+// SCENE 2: DEDICATED CONCEPT SCENE (DUAL CARD + VISUAL SPOTLIGHT)
+// -------------------------------------------------------------
+function drawConceptScene(
+  ctx: CanvasRenderingContext2D,
+  scene: Scene,
+  width: number,
+  height: number,
+  sceneTime: number,
+  project: VideoProject
+) {
+  ctx.save();
+
+  const startX = width * 0.04;
+  const contentY = height * 0.14;
+  const availableW = width * 0.92;
+  const leftW = availableW * 0.38;
+  const rightX = startX + leftW + width * 0.03;
+  const rightW = availableW * 0.59;
+  const colHeight = height * 0.72;
+
+  // 1. LEFT CARD: Thematic Visual Illustration in a Glowing Rounded Frame
+  const cardAlpha = Math.min(1, sceneTime * 2.5);
+  ctx.globalAlpha = cardAlpha;
+
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+  ctx.shadowColor = 'rgba(139, 92, 246, 0.4)';
+  ctx.shadowBlur = 18;
+  ctx.beginPath();
+  ctx.roundRect(startX, contentY, leftW, colHeight, 18);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  const leftGrad = ctx.createLinearGradient(startX, contentY, startX + leftW, contentY + colHeight);
+  leftGrad.addColorStop(0, '#8B5CF6');
+  leftGrad.addColorStop(1, '#3B82F6');
+  ctx.strokeStyle = leftGrad;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Render Image inside Left Frame
+  const imgRadius = 14;
+  const imgPad = 12;
+  const imgX = startX + imgPad;
+  const imgY = contentY + imgPad;
+  const imgW = leftW - imgPad * 2;
+  const imgH = colHeight * 0.58;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(imgX, imgY, imgW, imgH, imgRadius);
+  ctx.clip();
+
+  const cachedImg = scene.visualUrl ? imageCache.get(scene.visualUrl) : null;
+  if (cachedImg && cachedImg.complete && cachedImg.naturalWidth > 0) {
+    const zoomProgress = Math.min(1, sceneTime / (scene.duration || 10));
+    const zScale = 1.0 + zoomProgress * 0.08;
+    ctx.translate(imgX + imgW / 2, imgY + imgH / 2);
+    ctx.scale(zScale, zScale);
+    ctx.translate(-(imgX + imgW / 2), -(imgY + imgH / 2));
+    ctx.drawImage(cachedImg, imgX, imgY, imgW, imgH);
+  } else {
+    const grad = ctx.createLinearGradient(imgX, imgY, imgX + imgW, imgY + imgH);
+    grad.addColorStop(0, '#4C1D95');
+    grad.addColorStop(1, '#1E1B4B');
+    ctx.fillStyle = grad;
+    ctx.fillRect(imgX, imgY, imgW, imgH);
+
+    ctx.fillStyle = '#C4B5FD';
+    ctx.font = `bold ${Math.round(height * 0.06)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('💡', imgX + imgW / 2, imgY + imgH / 2 + 10);
+  }
+  ctx.restore();
+
+  // Badge over image
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+  ctx.beginPath();
+  ctx.roundRect(imgX + 10, imgY + 10, imgW - 20, height * 0.038, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#A78BFA';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = '#EDE9FE';
+  ctx.font = `bold ${Math.round(height * 0.019)}px 'Outfit', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText('💡 ILUSTRASI & MEDIA KONSEP', imgX + imgW / 2, imgY + height * 0.034);
+
+  // Left Bottom Box: Key Term / Highlight
+  const termY = imgY + imgH + 12;
+  const termH = colHeight - imgH - imgPad * 2 - 12;
+  ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
+  ctx.beginPath();
+  ctx.roundRect(imgX, termY, imgW, termH, 12);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = '#FDE047';
+  ctx.font = `bold ${Math.round(height * 0.02)}px 'Outfit', sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.fillText('⭐ KATA KUNCI MATERI:', imgX + 12, termY + height * 0.035);
+
+  const keywordsList = scene.keywords && scene.keywords.length > 0
+    ? scene.keywords.slice(0, 3).join(' • ')
+    : `${project.subject} • ${project.grade}`;
+  ctx.fillStyle = '#E2E8F0';
+  ctx.font = `600 ${Math.round(height * 0.02)}px 'Plus Jakarta Sans', sans-serif`;
+  const kwLines = wrapText(ctx, keywordsList, imgW - 24);
+  let curKwY = termY + height * 0.065;
+  kwLines.forEach((l) => {
+    ctx.fillText(l, imgX + 12, curKwY);
+    curKwY += height * 0.028;
+  });
+
+  // 2. RIGHT COLUMN: Big Title, Concept Definition, and Structured Takeaway Pillars
+  let curY = contentY + height * 0.02;
+
+  // Main Overlay Title
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${Math.round(height * 0.05)}px 'Outfit', sans-serif`;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+  ctx.shadowBlur = 10;
+  const titleLines = wrapText(ctx, scene.overlayTitle || scene.title, rightW);
+  titleLines.forEach((line) => {
+    ctx.fillText(line, rightX, curY);
+    curY += height * 0.058;
+  });
+
+  // Subtitle / Topic Focus
+  if (scene.overlaySubtitle) {
+    ctx.fillStyle = '#A78BFA';
+    ctx.font = `600 ${Math.round(height * 0.026)}px 'Plus Jakarta Sans', sans-serif`;
+    ctx.shadowBlur = 6;
+    const subLines = wrapText(ctx, scene.overlaySubtitle, rightW);
+    subLines.forEach((l) => {
+      ctx.fillText(l, rightX, curY);
+      curY += height * 0.036;
+    });
+  }
+
+  curY += height * 0.015;
+
+  // Concept Breakdown Cards
+  const points = (scene.bulletPoints && scene.bulletPoints.length > 0)
+    ? scene.bulletPoints
+    : [
+        scene.narration ? (scene.narration.length > 80 ? scene.narration.slice(0, 77) + '...' : scene.narration) : 'Pahami definisi dasar dan ruang lingkup materi.',
+        'Kuasai esensi materi sebagai fondasi pembelajaran.'
+      ];
+
+  points.forEach((pt, idx) => {
+    const ptTime = 0.6 + idx * 0.6;
+    if (sceneTime >= ptTime) {
+      const ptAlpha = Math.min(1, (sceneTime - ptTime) * 3);
+      ctx.globalAlpha = ptAlpha;
+
+      const cardW = rightW;
+      const textWrapW = cardW - height * 0.08;
+      ctx.font = `500 ${Math.round(height * 0.025)}px 'Plus Jakarta Sans', sans-serif`;
+      const wrapped = wrapText(ctx, pt, textWrapW);
+      const cHeight = Math.max(height * 0.065, height * 0.032 + wrapped.length * (height * 0.03));
+      const cY = curY;
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.roundRect(rightX, cY, cardW, cHeight, 12);
+      ctx.fill();
+
+      const borderColors = ['#8B5CF6', '#38BDF8', '#10B981'];
+      ctx.strokeStyle = borderColors[idx % borderColors.length];
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      // Number badge
+      const numRadius = height * 0.018;
+      const numX = rightX + height * 0.032;
+      const numY = cY + cHeight / 2;
+
+      ctx.fillStyle = borderColors[idx % borderColors.length];
+      ctx.beginPath();
+      ctx.arc(numX, numY, numRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `bold ${Math.round(height * 0.018)}px 'Outfit', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(`${idx + 1}`, numX, numY + height * 0.006);
+      ctx.textAlign = 'left';
+
+      ctx.fillStyle = '#F8FAFC';
+      ctx.font = `500 ${Math.round(height * 0.024)}px 'Plus Jakarta Sans', sans-serif`;
+      let textY = cY + (cHeight - (wrapped.length - 1) * height * 0.03) / 2 + height * 0.007;
+      wrapped.forEach((wLine) => {
+        ctx.fillText(wLine, rightX + height * 0.062, textY);
+        textY += height * 0.03;
+      });
+
+      curY += cHeight + height * 0.014;
+    }
+  });
+
+  ctx.restore();
+}
+
+// -------------------------------------------------------------
+// SCENE 3: DEDICATED EXPLANATION SCENE (STEPPED PROCESS FLOW)
+// -------------------------------------------------------------
+function drawExplanationScene(
+  ctx: CanvasRenderingContext2D,
+  scene: Scene,
+  width: number,
+  height: number,
+  sceneTime: number,
+  project: VideoProject
+) {
+  ctx.save();
+  const startX = width * 0.05;
+  const contentW = width * 0.90;
+  let curY = height * 0.14;
+
+  // 1. Stage Title & Pedagogical Banner
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${Math.round(height * 0.048)}px 'Outfit', sans-serif`;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+  ctx.shadowBlur = 12;
+  const titleLines = wrapText(ctx, scene.overlayTitle || scene.title, contentW - width * 0.2);
+  titleLines.forEach((l) => {
+    ctx.fillText(l, startX, curY);
+    curY += height * 0.054;
+  });
+
+  // Subtitle / Focus
+  if (scene.overlaySubtitle) {
+    ctx.fillStyle = '#38BDF8';
+    ctx.font = `600 ${Math.round(height * 0.026)}px 'Plus Jakarta Sans', sans-serif`;
+    ctx.shadowBlur = 6;
+    ctx.fillText(scene.overlaySubtitle, startX, curY);
+    curY += height * 0.038;
+  }
+
+  // Teacher Speaking Voice Animation on Top Right
+  const voiceW = width * 0.22;
+  const voiceH = height * 0.054;
+  const voiceX = width - startX - voiceW;
+  const voiceY = height * 0.14;
+
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+  ctx.beginPath();
+  ctx.roundRect(voiceX, voiceY, voiceW, voiceH, voiceH / 2);
+  ctx.fill();
+  ctx.strokeStyle = '#38BDF8';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.font = `${Math.round(height * 0.024)}px sans-serif`;
+  ctx.fillText('🎙️', voiceX + 12, voiceY + height * 0.036);
+
+  ctx.fillStyle = '#E0F2FE';
+  ctx.font = `bold ${Math.round(height * 0.018)}px 'Outfit', sans-serif`;
+  ctx.fillText('PENJELASAN GURU', voiceX + 40, voiceY + height * 0.034);
+
+  // Animated sound waves
+  for (let w = 0; w < 4; w++) {
+    const waveH = Math.sin(sceneTime * 12 + w) * 8 + 10;
+    const waveX = voiceX + voiceW - 35 + w * 6;
+    ctx.fillStyle = '#38BDF8';
+    ctx.fillRect(waveX, voiceY + voiceH / 2 - waveH / 2, 3, waveH);
+  }
+
+  curY += height * 0.015;
+
+  // 2. 3-Step Process Flow Cards
+  const points = (scene.bulletPoints && scene.bulletPoints.length > 0)
+    ? scene.bulletPoints
+    : [
+        scene.narration ? (scene.narration.length > 80 ? scene.narration.slice(0, 77) + '...' : scene.narration) : 'Perhatikan rukun dan tahapan pertama.',
+        'Laksanakan setiap tata cara dengan tertib.',
+        'Sempurnakan pemahaman dengan evaluasi diri.'
+      ];
+
+  const totalCards = Math.min(3, points.length);
+  const cardGap = width * 0.02;
+  const cardW = (contentW - cardGap * (totalCards - 1)) / totalCards;
+  const cardH = height * 0.46;
+
+  points.slice(0, 3).forEach((pt, idx) => {
+    const cX = startX + idx * (cardW + cardGap);
+    const cardTime = 0.5 + idx * 0.5;
+
+    if (sceneTime >= cardTime) {
+      const cAlpha = Math.min(1, (sceneTime - cardTime) * 3);
+      ctx.globalAlpha = cAlpha;
+
+      // Card Background
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.roundRect(cX, curY, cardW, cardH, 16);
+      ctx.fill();
+
+      const stepColors = ['#06B6D4', '#6366F1', '#10B981'];
+      ctx.strokeStyle = stepColors[idx % stepColors.length];
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Step Header Pill
+      const stepLabel = `TAHAP 0${idx + 1}`;
+      ctx.fillStyle = stepColors[idx % stepColors.length];
+      ctx.beginPath();
+      ctx.roundRect(cX + 12, curY + 12, cardW - 24, height * 0.042, 8);
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `bold ${Math.round(height * 0.02)}px 'Outfit', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(stepLabel, cX + cardW / 2, curY + height * 0.038);
+      ctx.textAlign = 'left';
+
+      // Step Content Text
+      ctx.fillStyle = '#F8FAFC';
+      ctx.font = `500 ${Math.round(height * 0.024)}px 'Plus Jakarta Sans', sans-serif`;
+      const wrapW = cardW - 28;
+      const wrapped = wrapText(ctx, pt, wrapW);
+      let tY = curY + height * 0.09;
+      wrapped.forEach((tLine) => {
+        ctx.fillText(tLine, cX + 14, tY);
+        tY += height * 0.034;
+      });
+
+      // Bottom Step Checkmark
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.beginPath();
+      ctx.roundRect(cX + 14, curY + cardH - height * 0.055, cardW - 28, height * 0.038, 8);
+      ctx.fill();
+
+      ctx.fillStyle = stepColors[idx % stepColors.length];
+      ctx.font = `bold ${Math.round(height * 0.018)}px 'Outfit', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('✓ PEMBAHASAN UTAMA', cX + cardW / 2, curY + cardH - height * 0.03);
+      ctx.textAlign = 'left';
+    }
+  });
+
+  ctx.restore();
+}
+
+// -------------------------------------------------------------
+// SCENE 4: DEDICATED EXAMPLE SCENE (CASE STUDY & REAL WORLD)
+// -------------------------------------------------------------
+function drawExampleScene(
+  ctx: CanvasRenderingContext2D,
+  scene: Scene,
+  width: number,
+  height: number,
+  sceneTime: number,
+  project: VideoProject
+) {
+  ctx.save();
+  const startX = width * 0.05;
+  const contentW = width * 0.90;
+  const leftW = contentW * 0.56;
+  const rightX = startX + leftW + width * 0.03;
+  const rightW = contentW * 0.41;
+  const colHeight = height * 0.70;
+  let curY = height * 0.14;
+
+  // 1. Title & Header
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${Math.round(height * 0.048)}px 'Outfit', sans-serif`;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+  ctx.shadowBlur = 12;
+  const titleLines = wrapText(ctx, scene.overlayTitle || scene.title, leftW);
+  titleLines.forEach((l) => {
+    ctx.fillText(l, startX, curY);
+    curY += height * 0.054;
+  });
+
+  if (scene.overlaySubtitle) {
+    ctx.fillStyle = '#34D399';
+    ctx.font = `600 ${Math.round(height * 0.026)}px 'Plus Jakarta Sans', sans-serif`;
+    ctx.shadowBlur = 6;
+    ctx.fillText(scene.overlaySubtitle, startX, curY);
+    curY += height * 0.038;
+  }
+
+  curY += height * 0.015;
+
+  // 2. Concrete Example Application Cards
+  const points = (scene.bulletPoints && scene.bulletPoints.length > 0)
+    ? scene.bulletPoints
+    : [
+        scene.narration ? (scene.narration.length > 80 ? scene.narration.slice(0, 77) + '...' : scene.narration) : 'Contoh penerapan nyata dalam kehidupan madrasah.',
+        'Studi kasus yang relevan dengan kehidupan sehari-hari siswa.'
+      ];
+
+  points.forEach((pt, idx) => {
+    const ptTime = 0.5 + idx * 0.6;
+    if (sceneTime >= ptTime) {
+      const pAlpha = Math.min(1, (sceneTime - ptTime) * 3);
+      ctx.globalAlpha = pAlpha;
+
+      ctx.font = `500 ${Math.round(height * 0.025)}px 'Plus Jakarta Sans', sans-serif`;
+      const wrapped = wrapText(ctx, pt, leftW - height * 0.08);
+      const cardH = Math.max(height * 0.075, height * 0.035 + wrapped.length * (height * 0.032));
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+      ctx.beginPath();
+      ctx.roundRect(startX, curY, leftW, cardH, 14);
+      ctx.fill();
+
+      ctx.strokeStyle = idx === 0 ? '#10B981' : '#38BDF8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Icon Box
+      const iconBoxX = startX + 14;
+      const iconBoxY = curY + 14;
+      ctx.font = `${Math.round(height * 0.03)}px sans-serif`;
+      ctx.fillText(idx === 0 ? '🏫' : '🌟', iconBoxX, iconBoxY + height * 0.026);
+
+      // Text
+      ctx.fillStyle = '#F8FAFC';
+      ctx.font = `500 ${Math.round(height * 0.024)}px 'Plus Jakarta Sans', sans-serif`;
+      let textY = curY + (cardH - (wrapped.length - 1) * height * 0.032) / 2 + height * 0.008;
+      wrapped.forEach((wLine) => {
+        ctx.fillText(wLine, startX + height * 0.065, textY);
+        textY += height * 0.032;
+      });
+
+      curY += cardH + height * 0.016;
+    }
+  });
+
+  // 3. RIGHT CARD: Framed Case Illustration & Takeaway Note
+  const rightY = height * 0.14;
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+  ctx.shadowColor = 'rgba(16, 185, 129, 0.35)';
+  ctx.shadowBlur = 16;
+  ctx.beginPath();
+  ctx.roundRect(rightX, rightY, rightW, colHeight, 18);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = '#10B981';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Image Frame inside Right Card
+  const rImgX = rightX + 12;
+  const rImgY = rightY + 12;
+  const rImgW = rightW - 24;
+  const rImgH = colHeight * 0.56;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(rImgX, rImgY, rImgW, rImgH, 12);
+  ctx.clip();
+
+  const cachedImg = scene.visualUrl ? imageCache.get(scene.visualUrl) : null;
+  if (cachedImg && cachedImg.complete && cachedImg.naturalWidth > 0) {
+    ctx.drawImage(cachedImg, rImgX, rImgY, rImgW, rImgH);
+  } else {
+    ctx.fillStyle = '#064E3B';
+    ctx.fillRect(rImgX, rImgY, rImgW, rImgH);
+    ctx.font = `bold ${Math.round(height * 0.06)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('🔬', rImgX + rImgW / 2, rImgY + rImgH / 2 + 10);
+  }
+  ctx.restore();
+
+  // Bottom Takeaway Box
+  const takeY = rImgY + rImgH + 12;
+  const takeH = colHeight - rImgH - 36;
+  ctx.fillStyle = 'rgba(6, 78, 59, 0.5)';
+  ctx.beginPath();
+  ctx.roundRect(rImgX, takeY, rImgW, takeH, 10);
+  ctx.fill();
+  ctx.strokeStyle = '#34D399';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = '#A7F3D0';
+  ctx.font = `bold ${Math.round(height * 0.02)}px 'Outfit', sans-serif`;
+  ctx.fillText('💡 TIPS PRAKTIK PEMBELAJARAN:', rImgX + 12, takeY + height * 0.034);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `500 ${Math.round(height * 0.02)}px 'Plus Jakarta Sans', sans-serif`;
+  const tipLines = wrapText(ctx, `Terapkan konsep ${project.title} dengan konsisten di kehidupan sehari-hari.`, rImgW - 24);
+  let curTipY = takeY + height * 0.064;
+  tipLines.forEach((t) => {
+    ctx.fillText(t, rImgX + 12, curTipY);
+    curTipY += height * 0.028;
+  });
+
+  ctx.restore();
+}
+
+// -------------------------------------------------------------
+// SCENE 5: DEDICATED SUMMARY SCENE (SYNTHESIS CHALKBOARD)
+// -------------------------------------------------------------
+function drawSummaryScene(
+  ctx: CanvasRenderingContext2D,
+  scene: Scene,
+  width: number,
+  height: number,
+  sceneTime: number,
+  project: VideoProject
+) {
+  ctx.save();
+  const boardX = width * 0.05;
+  const boardY = height * 0.14;
+  const boardW = width * 0.90;
+  const boardH = height * 0.72;
+
+  // 1. Synthesis Chalkboard Container
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+  ctx.shadowColor = 'rgba(245, 158, 11, 0.35)';
+  ctx.shadowBlur = 20;
+  ctx.beginPath();
+  ctx.roundRect(boardX, boardY, boardW, boardH, 20);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  const boardGrad = ctx.createLinearGradient(boardX, boardY, boardX + boardW, boardY + boardH);
+  boardGrad.addColorStop(0, '#F59E0B');
+  boardGrad.addColorStop(0.5, '#FBBF24');
+  boardGrad.addColorStop(1, '#D97706');
+  ctx.strokeStyle = boardGrad;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // 2. Header
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#FDE047';
+  ctx.font = `bold ${Math.round(height * 0.044)}px 'Outfit', sans-serif`;
+  ctx.fillText('📌 RANGKUMAN & KESIMPULAN UTAMA', width / 2, boardY + height * 0.065);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `600 ${Math.round(height * 0.026)}px 'Plus Jakarta Sans', sans-serif`;
+  ctx.fillText(scene.overlayTitle || `Poin-Poin Penting Materi: ${project.title}`, width / 2, boardY + height * 0.108);
+
+  // 3. Grid of Takeaway Cards (2 rows x 2 columns or 3 cards)
+  const points = (scene.bulletPoints && scene.bulletPoints.length > 0)
+    ? scene.bulletPoints
+    : [
+        'Kuasai konsep dasar dan hukum/aturan yang berlaku.',
+        'Lakukan langkah-langkah penerapan secara tertib.',
+        'Amalkan ilmu yang diperoleh untuk meraih keberkahan.'
+      ];
+
+  const gridY = boardY + height * 0.14;
+  const gridW = boardW - 40;
+  const numCards = points.length;
+
+  if (numCards <= 3) {
+    const cardH = (boardH - height * 0.20) / numCards;
+    points.forEach((pt, idx) => {
+      const cY = gridY + idx * (cardH + 8);
+      const pTime = 0.4 + idx * 0.5;
+
+      if (sceneTime >= pTime) {
+        ctx.globalAlpha = Math.min(1, (sceneTime - pTime) * 3);
+
+        ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
+        ctx.beginPath();
+        ctx.roundRect(boardX + 20, cY, gridW, cardH - 8, 12);
+        ctx.fill();
+
+        ctx.strokeStyle = '#F59E0B';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Checkmark badge
+        const badgeX = boardX + 45;
+        const badgeY = cY + (cardH - 8) / 2;
+        ctx.fillStyle = '#F59E0B';
+        ctx.beginPath();
+        ctx.arc(badgeX, badgeY, height * 0.022, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = `bold ${Math.round(height * 0.022)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('✓', badgeX, badgeY + height * 0.008);
+        ctx.textAlign = 'left';
+
+        // Content
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `600 ${Math.round(height * 0.026)}px 'Plus Jakarta Sans', sans-serif`;
+        const wrapped = wrapText(ctx, pt, gridW - height * 0.1);
+        let tY = cY + ((cardH - 8) - (wrapped.length - 1) * height * 0.032) / 2 + height * 0.008;
+        wrapped.forEach((w) => {
+          ctx.fillText(w, boardX + height * 0.09, tY);
+          tY += height * 0.032;
+        });
+      }
+    });
+  } else {
+    // 2x2 Grid
+    const cardW = (gridW - 16) / 2;
+    const cardH = (boardH - height * 0.22) / 2;
+
+    points.slice(0, 4).forEach((pt, idx) => {
+      const col = idx % 2;
+      const row = Math.floor(idx / 2);
+      const cX = boardX + 20 + col * (cardW + 16);
+      const cY = gridY + row * (cardH + 12);
+
+      const pTime = 0.4 + idx * 0.4;
+      if (sceneTime >= pTime) {
+        ctx.globalAlpha = Math.min(1, (sceneTime - pTime) * 3);
+
+        ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
+        ctx.beginPath();
+        ctx.roundRect(cX, cY, cardW, cardH, 12);
+        ctx.fill();
+
+        ctx.strokeStyle = '#F59E0B';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `600 ${Math.round(height * 0.024)}px 'Plus Jakarta Sans', sans-serif`;
+        const wrapped = wrapText(ctx, pt, cardW - 24);
+        let tY = cY + height * 0.045;
+        wrapped.forEach((w) => {
+          ctx.fillText(w, cX + 12, tY);
+          tY += height * 0.03;
+        });
+      }
+    });
+  }
+
+  ctx.restore();
+}
+
+// -------------------------------------------------------------
+// STANDARD SCENE (FALLBACK)
 // -------------------------------------------------------------
 function drawStandardScene(
   ctx: CanvasRenderingContext2D,

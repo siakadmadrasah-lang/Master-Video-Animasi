@@ -270,7 +270,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
     setMaterialGeneratedSuccess(false);
 
     try {
-      const res拼 = await fetch('/api/ai/generate-material', {
+      const res = await fetch('/api/ai/generate-material', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -282,11 +282,11 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
         }),
       });
 
-      if (!res拼.ok) {
+      if (!res.ok) {
         throw new Error('Gagal menghasilkan teks materi.');
       }
 
-      const data = await res拼.json();
+      const data = await res.json();
       if (data.material) {
         setLearningMaterial(data.material);
         if (!title.trim() || title === 'Video Baru') {
