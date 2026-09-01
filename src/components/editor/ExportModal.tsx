@@ -307,8 +307,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         {/* Render Finished Successfully */}
         {renderedBlobUrl && !isRendering && (
           <div className="space-y-4 py-2 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400">
-              <CheckCircle2 className="h-8 w-8" />
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400">
+              <CheckCircle2 className="h-6 w-6" />
             </div>
 
             <div>
@@ -316,18 +316,28 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 Render Video Selesai!
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                Berkas video telah otomatis diunduh ke perangkat Anda.
+                Audio suara narasi & musik latar telah disinkronkan 100% ke dalam berkas video.
               </p>
             </div>
 
-            <div className="flex gap-2 justify-center">
+            {/* Instant Rendered Video Preview with Audio */}
+            <div className="rounded-2xl overflow-hidden border border-slate-800 bg-black aspect-video max-h-48 mx-auto shadow-inner">
+              <video
+                src={renderedBlobUrl}
+                controls
+                autoPlay
+                className="w-full h-full object-contain"
+              />
+            </div>
+
+            <div className="flex gap-2 justify-center pt-2">
               <a
                 href={renderedBlobUrl}
                 download={`${project.title.replace(/\s+/g, '_')}.webm`}
-                className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-indigo-700 transition-all"
+                className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-indigo-700 transition-all shadow-lg"
               >
                 <Download className="h-4 w-4" />
-                Unduh Ulang Video
+                Unduh Berkas Video (.webm)
               </a>
               <button
                 onClick={onClose}

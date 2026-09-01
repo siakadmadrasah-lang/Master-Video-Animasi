@@ -21,7 +21,8 @@ import {
   playBgmAudio, 
   pauseBgmAudio, 
   resumeBgmAudio, 
-  setBgmVolume 
+  setBgmVolume,
+  setMuteState
 } from '../../utils/audioSynth.ts';
 
 interface LiveVideoPlayerProps {
@@ -84,8 +85,17 @@ export const LiveVideoPlayer: React.FC<LiveVideoPlayerProps> = ({
         setCurrentTime(0);
       }
       setIsPlaying(true);
-      if (project.audioTrack?.musicUrl && !isMuted) {
-        playBgmAudio(project.audioTrack.musicUrl, project.audioTrack.volume || 30, true);
+      if (!isMuted) {
+        playBgmAudio(undefined, project.audioTrack?.volume || 30, true);
+        const { scene, sceneTime } = getSceneAtTime(currentTime >= totalDuration ? 0 : currentTime);
+        if (scene?.narration && sceneTime < 1.0) {
+          lastSpokenSceneRef.current = activeSceneIndex;
+          speakNarrationBrowser(scene.narration, {
+            gender: project.voiceConfig?.gender || 'female',
+            speed: project.voiceConfig?.speed || 1.0,
+            pitch: project.voiceConfig?.pitch || 1.0,
+          });
+        }
       }
     }
   };
@@ -396,10 +406,9 @@ export const LiveVideoPlayer: React.FC<LiveVideoPlayerProps> = ({
             {/* Mute/Volume */}
             <button
               onClick={() => {
-                setIsMuted(!isMuted);
-                if (!isMuted) {
-                  stopAllAudio();
-                }
+                const nextMuted = !isMuted;
+                setIsMuted(nextMuted);
+                setMuteState(nextMuted);
               }}
               className="rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
             >
