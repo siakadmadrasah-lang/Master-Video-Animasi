@@ -489,13 +489,18 @@ Format Output WAJIB berupa JSON Object valid:
 
       // Build Gemini Prompt
       const systemInstruction = `Anda adalah Sutradara & Produser Video Edukasi AI Profesional terbaik di Indonesia ("EduVideo AI").
-Tugas Anda adalah merancang Storyboard dan Script Video Pembelajaran yang sangat terstruktur, menarik, mudah dipahami siswa, interaktif, dan disesuaikan secara presisi dengan jenjang kelas: "${grade}".
+Tugas Anda adalah merancang Storyboard dan Script Video Pembelajaran yang SANGAT MENDALAM, TERSTRUKTUR, DAN MENJELASKAN MATERI PEMBELAJARAN SECARA UTUH untuk jenjang kelas: "${grade}".
+
+⚠️ PERINGATAN PENTING & WAJIB:
+- Di dalam video, siswa HARUS MENDENGARKAN DAN MELIHAT PENJELASAN MATERI SECARA JELAS DAN NYATA.
+- DILARANG KERAS membuat narasi basa-basi/template umum kosong (seperti "Mari kita simak penjelasannya...").
+- Narasi (narration) dan poin-poin layar (bulletPoints) pada Scene 2 (Konsep), Scene 3 (Penjelasan Mendalam), Scene 4 (Contoh), dan Scene 5 (Rangkuman) WAJIB MENJELASKAN SECARA RINCI isi materi pembelajaran: definisi, rukun/unsur, langkah-langkah, fungsi, dalil/aturan, dan contoh nyata dari teks yang diberikan.
 
 Pedoman Penyesuaian Pedagogis Berdasarkan Jenjang / Kelas:
-- Kelas 1 MI & Kelas 2 MI (Fase A): Gunakan kalimat sangat pendek, ceria, hangat, kata-kata sederhana, sapaan akrab seperti "Adik-adik cerdas" atau "Teman-teman saleh & salehah". Soal kuis sangat mudah dan berbasis kebiasaan konkret.
-- Kelas 3 MI & Kelas 4 MI (Fase B): Narasi komunikatif, mengenalkan urutan langkah, cerita teladan, dan contoh di lingkungan madrasah. Soal kuis menguji pemahaman fakta dan urutan rukun/tata cara.
-- Kelas 5 MI & Kelas 6 MI (Fase C): Penjelasan runtut dan berbobot, memasukkan hikmah mendalam, dalil/ayat ringkas, dan penalaran logis. Soal kuis menguji pemahaman konsep dan analisa penerapan.
-- SD / SMP / SMA: Sesuaikan tingkat kesulitan kosa kata dan penalaran ilmiah dengan kurikulum masing-masing.
+- Kelas 1 MI & Kelas 2 MI (Fase A): Kalimat pendek, ceria, hangat, sapaan akrab "Adik-adik pintar". Penjelasan materi konkret dan sederhana.
+- Kelas 3 MI & Kelas 4 MI (Fase B): Narasi komunikatif, mengenalkan urutan langkah, rukun, tata cara, dan contoh di lingkungan madrasah.
+- Kelas 5 MI & Kelas 6 MI (Fase C): Penjelasan runtut dan berbobot, memasukkan hikmah mendalam, dalil/fakta ilmiah, dan penalaran logis.
+- SD / SMP / SMA: Sesuaikan kosa kata dan penalaran ilmiah dengan kurikulum masing-masing.
 
 Format Output WAJIB berupa JSON Object murni dengan skema:
 {
@@ -508,14 +513,14 @@ Format Output WAJIB berupa JSON Object murni dengan skema:
       "title": string, // Judul scene e.g. "1. Pengenalan & Apersepsi"
       "overlayTitle": string, // Judul besar di layar video (3-6 kata)
       "overlaySubtitle": string, // Subtitle/keterangan visual di layar
-      "narration": string, // Narasi suara pengajar dalam Bahasa Indonesia yang alami, ramah, artikulatif, dan sesuai durasi (sekitar ${avgDurationPerScene} detik)
+      "narration": string, // Narasi suara pengajar yang MENJELASKAN MATERI SECARA GAMBLANG dalam Bahasa Indonesia yang alami, ramah, artikulatif, dan sesuai durasi (sekitar ${avgDurationPerScene} detik)
       "duration": number, // Durasi detik (antara 8 sampai 25 detik)
       "visualPrompt": string, // Deskripsi detail visual/animasi untuk gaya "${visualStyle}"
       "visualType": "image" | "gradient" | "diagram" | "code" | "quiz_card",
       "animationType": "zoom-in" | "pan-left" | "pan-right" | "float",
       "transitionType": "fade" | "slide-left" | "zoom" | "dissolve",
-      "keywords": [string], // 2-4 kata kunci penting
-      "bulletPoints": [string], // 2-3 poin ringkas untuk ditampilkan di layar video
+      "keywords": [string], // 2-4 kata kunci penting dari materi
+      "bulletPoints": [string], // 2-4 poin konkret materi yang ditampilkan di layar video (BUKAN kalimat kosong, tapi fakta materi!)
       "quizQuestion": { // WAJIB ADA jika sceneType === "quiz"
         "question": string,
         "options": [string, string, string, string],
@@ -527,15 +532,15 @@ Format Output WAJIB berupa JSON Object murni dengan skema:
 }
 
 Ketentuan 7 Scene Wajib:
-1. "intro": Pengenalan menarik, apersepsi membangkitkan rasa ingin tahu siswa jenjang ${grade}.
-2. "learning_concept": Tujuan pembelajaran & konsep dasar yang akan dipelajari.
-3. "explanation": Penjelasan inti materi secara jelas, runtut, dan mudah dicerna tingkat ${grade}.
-4. "example": Contoh kasus nyata / analogi dalam kehidupan sehari-hari siswa.
-5. "summary": Rangkuman / kesimpulan poin-poin terpenting materi.
-6. "quiz": 1 Soal kuis pilihan ganda interaktif beserta 4 pilihan (A, B, C, D), kunci jawaban benar (0-3), dan pembahasan singkat yang sesuai tingkat kelas ${grade}.
-7. "outro": Penutup apresiatif, pesan motivasi belajar, dan ajakan refleksi.`;
+1. "intro": Pengenalan menarik, apersepsi membangkitkan rasa ingin tahu siswa jenjang ${grade} terhadap topik materi.
+2. "learning_concept": Definisi & konsep dasar yang menjelaskan apa itu materi ini dan mengapa penting dipelajari.
+3. "explanation": Penjelasan inti materi secara mendalam, runtut, rinci (rukun/langkah/proses/unsur materi) sesuai teks materi pembelajaran.
+4. "example": Contoh kasus nyata, praktik penerapan, atau analogi dalam kehidupan sehari-hari siswa.
+5. "summary": Rangkuman / kesimpulan poin-poin terpenting materi pembelajaran.
+6. "quiz": 1 Soal kuis pilihan ganda interaktif yang menguji pemahaman materi yang baru saja dijelaskan, beserta 4 pilihan (A, B, C, D), kunci jawaban benar (0-3), dan pembahasan guru.
+7. "outro": Penutup apresiatif, pesan motivasi belajar, dan ajakan mengamalkan ilmu.`;
 
-      const userPrompt = `Buatkan storyboard video pembelajaran lengkap:
+      const userPrompt = `Buatkan storyboard video pembelajaran LENGKAP DENGAN PENJELASAN MATERI MENDALAM:
 Judul: ${title}
 Mata Pelajaran: ${subject}
 Jenjang Kelas: ${grade}
@@ -543,7 +548,7 @@ Gaya Visual: ${visualStyle}
 Target Durasi: ${targetDurationMinutes} Menit (Total ~${totalTargetSeconds} detik)
 Bahasa: ${language}
 
-Materi / Teks Pembelajaran:
+Teks Materi Pembelajaran yang HARUS DIJELASKAN SECARA GAMBLANG dalam narasi dan poin layar:
 """
 ${learningMaterial}
 """`;
@@ -1036,22 +1041,83 @@ function generateFallbackStoryboard(params: {
     };
   }
 
-  const sentences = params.learningMaterial
-    .split(/[.!?]+/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 5);
+  // Intelligent multi-strategy fallback generator extracting substantive content from learningMaterial
+  const cleanMaterial = params.learningMaterial.trim();
+  const rawSentences = cleanMaterial
+    .replace(/\r\n/g, '\n')
+    .split(/\n+|(?<=[.!?])\s+/)
+    .map((s) => s.replace(/^[0-9\-\*\•\.\s]+/, '').trim())
+    .filter((s) => s.length > 8);
+
+  // Extract explicit bullet items if user provided numbers, bullets, or dashes
+  const rawBullets = cleanMaterial
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => /^[0-9]+[\.\)]|^\-|^•|^\*/.test(line))
+    .map((line) => line.replace(/^[0-9]+[\.\)\-•\*\s]+/, '').trim())
+    .filter((b) => b.length > 5);
 
   const introGreeting = isLowerMI
-    ? `Halo adik-adik ${params.grade} yang ceria dan pintar! Hari ini kita belajar ${params.subject} yang sangat seru: "${params.title}"!`
+    ? `Halo adik-adik ${params.grade} yang ceria dan pintar! Hari ini kita belajar materi ${params.subject} yang sangat istimewa, yaitu "${params.title}". Simak baik-baik penjelasannya ya!`
     : isMidMI
-    ? `Assalamu'alaikum sahabat cerdas ${params.grade}! Selamat datang di pembelajaran ${params.subject}. Hari ini kita mendalami topik: "${params.title}"!`
-    : `Halo teman-teman pembelajar ${params.grade}! Selamat datang di materi ${params.subject}. Hari ini kita mengkaji topik: "${params.title}"!`;
+    ? `Assalamu'alaikum sahabat cerdas ${params.grade}! Selamat datang di pembelajaran ${params.subject}. Hari ini kita akan mengkaji materi penting tentang "${params.title}". Mari kita pelajari bersama-sama!`
+    : `Halo rekan-rekan pembelajar ${params.grade}! Selamat datang di media video pembelajaran ${params.subject}. Pada topik kali ini, kita mendalami bahasan "${params.title}".`;
 
-  const s1 = sentences[0] || `Mari kita pelajari konsep ${params.title} secara runtut dan menyenangkan.`;
-  const s2 = sentences[1] || `Materi ini membekali kita dengan pemahaman penting mengenai ${params.subject}.`;
-  const s3 = sentences[2] || `Perhatikan setiap tahapan dan penjelasan inti dengan cermat.`;
-  const s4 = sentences[3] || `Kita dapat mengamati contoh penerapannya dalam kehidupan sehari-hari.`;
-  const s5 = sentences[4] || `Sebagai kesimpulan, ingatlah selalu konsep utama materi ${params.title}.`;
+  // Scene 2 Concept & Definition
+  const sConcept = rawSentences[0] || `${params.title} merupakan konsep fundamental dalam ${params.subject}.`;
+  const sConcept2 = rawSentences[1] || `Memahami materi ini membantu kita menguasai kompetensi dasar secara mendalam.`;
+
+  // Scene 3 In-Depth Explanation
+  const sExpl1 = rawSentences[2] || rawSentences[0] || `Perhatikan setiap tahapan dan rukun dalam materi ${params.title}.`;
+  const sExpl2 = rawSentences[3] || rawSentences[1] || `Seluruh unsur tersebut saling berkaitan membentuk pemahaman yang utuh.`;
+  const sExpl3 = rawSentences[4] || '';
+
+  // Scene 4 Example & Application
+  const sExample = rawSentences[5] || rawSentences[2] || `Dalam kehidupan sehari-hari, konsep ${params.title} dapat kita jumpai dan terapkan secara langsung.`;
+  const sExample2 = rawSentences[6] || `Penerapan yang konsisten membawa manfaat besar bagi diri dan lingkungan kita.`;
+
+  // Scene 5 Summary
+  const sSummary = rawSentences[rawSentences.length - 1] || `Sebagai kesimpulan, ingatlah selalu konsep utama dan kaidah dari ${params.title}.`;
+
+  // Extract key terms for keywords
+  const extractedKeywords = Array.from(new Set(
+    cleanMaterial
+      .replace(/[^\w\s\u00C0-\u024F]/gi, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length > 4 && !['adalah', 'dengan', 'secara', 'karena', 'seperti', 'dalam', 'untuk', 'kepada', 'tersebut', 'bahwa', 'sangat', 'setiap', 'antara'].includes(w.toLowerCase()))
+  )).slice(0, 4);
+
+  const finalKeywords = extractedKeywords.length >= 2 ? extractedKeywords : [params.subject, params.title.split(' ')[0], params.grade];
+
+  // Concrete bullet points for Scene 2 (Concept)
+  const scene2Bullets = rawBullets.length >= 2
+    ? rawBullets.slice(0, 2)
+    : [
+        sConcept.length > 70 ? sConcept.slice(0, 67) + '...' : sConcept,
+        sConcept2.length > 70 ? sConcept2.slice(0, 67) + '...' : sConcept2,
+      ];
+
+  // Concrete bullet points for Scene 3 (Explanation)
+  const scene3Bullets = rawBullets.length >= 4
+    ? rawBullets.slice(2, 4)
+    : rawBullets.length >= 2
+    ? rawBullets.slice(0, 2)
+    : [
+        sExpl1.length > 70 ? sExpl1.slice(0, 67) + '...' : sExpl1,
+        sExpl2.length > 70 ? sExpl2.slice(0, 67) + '...' : sExpl2,
+      ];
+
+  // Concrete bullet points for Scene 4 (Example)
+  const scene4Bullets = [
+    `Penerapan konsep ${params.title} secara tepat`,
+    sExample.length > 65 ? sExample.slice(0, 62) + '...' : sExample,
+  ];
+
+  // Concrete bullet points for Scene 5 (Summary)
+  const scene5Bullets = [
+    `Intisari pokok materi: ${params.title}`,
+    sSummary.length > 65 ? sSummary.slice(0, 62) + '...' : sSummary,
+  ];
 
   return {
     title: params.title,
@@ -1069,97 +1135,95 @@ function generateFallbackStoryboard(params: {
         visualType: 'image',
         animationType: 'zoom-in',
         transitionType: 'fade',
-        keywords: [params.subject, params.grade, 'Edukasi'],
-        bulletPoints: [`Pengenalan materi ${params.title}`, `Materi pokok jenjang ${params.grade}`],
+        keywords: finalKeywords,
+        bulletPoints: [`Pengenalan topik ${params.title}`, `Materi pokok ${params.subject} (${params.grade})`],
       },
       {
         order: 2,
         sceneType: 'learning_concept',
-        title: '2. Tujuan & Konsep Utama',
-        overlayTitle: 'Konsep Dasar Pembelajaran',
-        overlaySubtitle: `Tujuan & Manfaat untuk ${params.grade}`,
-        narration: `${s1} ${s2}`,
-        duration: 11,
+        title: '2. Pengertian & Konsep Dasar',
+        overlayTitle: 'Pengertian & Konsep Dasar',
+        overlaySubtitle: `Definisi Materi ${params.title}`,
+        narration: `${sConcept} ${sConcept2}`,
+        duration: 12,
         visualPrompt: `Diagram visual konsep pembelajaran ${params.title} ramah siswa ${params.grade} dengan gaya ${params.visualStyle}`,
         visualType: 'diagram',
         animationType: 'pan-right',
         transitionType: 'slide-left',
-        keywords: ['Konsep Dasar', 'Tujuan Belajar'],
-        bulletPoints: ['Mengenali unsur-unsur kunci materi', 'Memahami alur dasar pengetahuan'],
+        keywords: finalKeywords.slice(0, 3),
+        bulletPoints: scene2Bullets,
       },
       {
         order: 3,
         sceneType: 'explanation',
-        title: '3. Penjelasan Mendalam',
-        overlayTitle: 'Inti Materi & Penjelasan',
-        overlaySubtitle: 'Penjelasan Runtut & Mudah Dipahami',
-        narration: s3 + (isLowerMI ? ' Ayo kita perhatikan dengan seksama ya!' : ' Setiap tahapan memiliki fungsi spesifik yang sangat penting.'),
-        duration: 13,
-        visualPrompt: `Infografis penjelasan rinci materi ${params.title} dengan gaya ${params.visualStyle}`,
+        title: '3. Penjelasan Rinci & Tata Cara',
+        overlayTitle: 'Penjelasan Rinci Materi',
+        overlaySubtitle: `Rukun, Langkah & Unsur Penting`,
+        narration: `${sExpl1} ${sExpl2} ${sExpl3}`.trim(),
+        duration: 14,
+        visualPrompt: `Infografis penjelasan rinci dan bagan terstruktur materi ${params.title} dengan gaya ${params.visualStyle}`,
         visualType: 'diagram',
         animationType: 'pan-left',
         transitionType: 'fade',
-        keywords: ['Penjelasan', 'Langkah', 'Materi'],
-        bulletPoints: ['Langkah 1: Mengenal hal pokok', 'Langkah 2: Pelaksanaan yang tertib'],
+        keywords: finalKeywords,
+        bulletPoints: scene3Bullets,
       },
       {
         order: 4,
         sceneType: 'example',
-        title: '4. Contoh Kasus Nyata',
-        overlayTitle: 'Aplikasi dalam Kehidupan Nyata',
-        overlaySubtitle: 'Praktik & Contoh di Sekitar Kita',
-        narration: s4 + (isLowerMI ? ' Seru sekali ya mempraktikkannya bersama teman dan keluarga.' : ' Sangat bermanfaat ketika kita terapkan dalam rutinitas harian.'),
+        title: '4. Contoh & Aplikasi Nyata',
+        overlayTitle: 'Contoh & Aplikasi Nyata',
+        overlaySubtitle: 'Penerapan Praktis Sehari-hari',
+        narration: `${sExample} ${sExample2}`,
         duration: 11,
         visualPrompt: `Ilustrasi aplikasi dunia nyata topik ${params.title} dengan gaya ${params.visualStyle}`,
         visualType: 'image',
         animationType: 'zoom-in',
         transitionType: 'slide-left',
-        keywords: ['Contoh Nyata', 'Aplikasi Praktis'],
-        bulletPoints: ['Penerapan dalam kehidupan sehari-hari', 'Manfaat nyata bagi diri sendiri dan lingkungan'],
+        keywords: ['Penerapan', 'Contoh Kasus', params.subject],
+        bulletPoints: scene4Bullets,
       },
       {
         order: 5,
         sceneType: 'summary',
-        title: '5. Rangkuman Materi',
+        title: '5. Rangkuman Poin Penting',
         overlayTitle: 'Rangkuman Poin Penting',
-        overlaySubtitle: `Intisari Pembelajaran ${params.grade}`,
-        narration: s5 + ' Ingat selalu poin-poin utama di layar ini ya!',
-        duration: 10,
+        overlaySubtitle: `Kesimpulan Materi ${params.title}`,
+        narration: `Mari kita ingat kesimpulannya: ${sSummary} Pahami selalu poin-poin penting pada rangkuman ini ya!`,
+        duration: 11,
         visualPrompt: `Papan rangkuman poin penting topik ${params.title} dengan gaya ${params.visualStyle}`,
         visualType: 'gradient',
         animationType: 'zoom-in',
         transitionType: 'fade',
-        keywords: ['Rangkuman', 'Poin Kunci'],
-        bulletPoints: ['Pahami inti konsep dasar', 'Kaitkan dengan kebiasaan sehari-hari'],
+        keywords: ['Rangkuman', 'Kesimpulan', params.subject],
+        bulletPoints: scene5Bullets,
       },
       {
         order: 6,
         sceneType: 'quiz',
-        title: '6. Kuis Interaktif',
-        overlayTitle: 'Kuis Evaluasi Ceria',
+        title: '6. Kuis Evaluasi Pemahaman',
+        overlayTitle: 'Kuis Evaluasi Pemahaman',
         overlaySubtitle: `Uji Pemahaman Siswa ${params.grade}`,
         narration: isLowerMI
           ? `Saatnya kuis ceria! Menurut adik-adik, manakah hal yang paling benar tentang ${params.title}?`
-          : `Saatnya kuis interaktif! Menurutmu, manakah pernyataan yang paling tepat mengenai ${params.title}?`,
-        duration: 11,
+          : `Saatnya kuis interaktif! Berdasarkan penjelasan materi tadi, manakah pernyataan yang paling tepat mengenai ${params.title}?`,
+        duration: 12,
         visualPrompt: `Panel kuis interaktif ramah anak dengan opsi pilihan ganda bercahaya`,
         visualType: 'quiz_card',
         animationType: 'zoom-in',
         transitionType: 'fade',
-        keywords: ['Kuis', 'Evaluasi', 'Interaktif'],
+        keywords: ['Kuis Evaluasi', params.subject, 'Pemahaman'],
         bulletPoints: ['Pilih jawaban yang paling tepat!'],
         quizQuestion: {
-          question: isLowerMI
-            ? `Apa yang kita lakukan saat mempelajari ${params.title}?`
-            : `Manakah pernyataan yang paling tepat mengenai materi ${params.title}?`,
+          question: `Berdasarkan pembelajaran, manakah hal yang paling tepat mengenai ${params.title}?`,
           options: [
-            `A. Mempraktikkannya dengan tertib dan sungguh-sungguh`,
-            'B. Melakukannya secara terburu-buru dan asal-asalan',
-            'C. Mengabaikan aturan dan rukun yang ada',
-            'D. Tidak perlu dipelajari sama sekali'
+            `A. ${sConcept.length > 50 ? sConcept.slice(0, 48) + '...' : sConcept}`,
+            'B. Materi ini tidak memiliki fungsi dalam kehidupan sehari-hari',
+            'C. Dilakukan secara sembarangan tanpa aturan yang benar',
+            'D. Mengabaikan rukun dan tata cara yang berlaku'
           ],
           correctIndex: 0,
-          explanation: `Tepat sekali! Memahami dan mempraktikkan ${params.title} dengan tertib adalah kunci keberhasilan belajar.`
+          explanation: `Benar sekali! ${sConcept}`
         }
       },
       {
@@ -1167,17 +1231,17 @@ function generateFallbackStoryboard(params: {
         sceneType: 'outro',
         title: '7. Penutup & Motivasi Belajar',
         overlayTitle: 'Terus Semangat Belajar!',
-        overlaySubtitle: 'Menjadikan Pembelajaran Lebih Menyenangkan',
+        overlaySubtitle: 'Amalkan Ilmu Kebaikan dalam Keseharian',
         narration: isLowerMI
-          ? `Hebat sekali! Kalian semua anak pintar dan saleh. Sampai jumpa di video pembelajaran berikutnya ya!`
-          : `Luar biasa! Kamu telah menyelesaikan sesi belajar tentang ${params.title}. Teruslah belajar dan mengamalkan ilmu kebaikan!`,
-        duration: 8,
-        visualPrompt: `Ilustrasi penutup inspiratif siswa MI ceria bersemangat dengan gaya ${params.visualStyle}`,
+          ? `Alhamdulillah, luar biasa! Kalian telah menyelesaikan pembelajaran "${params.title}". Teruslah menjadi anak cerdas dan rajin belajar ya. Sampai jumpa!`
+          : `Alhamdulillah! Anda telah menuntaskan video pembelajaran "${params.title}". Amalkan ilmu ini dan teruslah berprestasi. Sampai jumpa di video pembelajaran berikutnya!`,
+        duration: 9,
+        visualPrompt: `Ilustrasi penutup inspiratif siswa madrasah ceria bersemangat dengan gaya ${params.visualStyle}`,
         visualType: 'image',
         animationType: 'zoom-in',
         transitionType: 'fade',
-        keywords: ['Refleksi', 'Motivasi'],
-        bulletPoints: ['Terus kembangkan rasa ingin tahu', 'Salam sukses belajar!'],
+        keywords: ['Alhamdulillah', 'Motivasi', 'Prestasi'],
+        bulletPoints: ['Amalkan ilmu dalam kehidupan', 'Salam sukses belajar!'],
       },
     ],
   };

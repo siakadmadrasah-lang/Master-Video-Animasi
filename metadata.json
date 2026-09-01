@@ -2,5 +2,7 @@
   "name": "EduVideo AI",
   "description": "Aplikasi video berbasis AI untuk membuat video pembelajaran interaktif otomatis lengkap dengan storyboard, narasi TTS, subtitle, visual, quiz, dan timeline editor.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

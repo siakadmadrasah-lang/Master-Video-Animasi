@@ -12,10 +12,14 @@ import {
   RotateCcw, 
   Share2, 
   Download, 
-  Layers 
+  Layers,
+  Volume2,
+  FileText,
+  Sparkles
 } from 'lucide-react';
 import { VideoProject, Scene } from '../types.ts';
 import { LiveVideoPlayer } from './editor/LiveVideoPlayer.tsx';
+import { speakNarrationBrowser } from '../utils/audioSynth.ts';
 
 interface InteractivePlayerModalProps {
   project: VideoProject;
@@ -31,6 +35,8 @@ export const InteractivePlayerModal: React.FC<InteractivePlayerModalProps> = ({
   const [activeSceneIndex, setActiveSceneIndex] = useState<number>(0);
   const [userScore, setUserScore] = useState<number>(0);
   const [answeredQuizzes, setAnsweredQuizzes] = useState<Record<string, number>>({});
+  const [activeTab, setActiveTab] = useState<'explanation' | 'quiz'>('explanation');
+  const [playingSceneNarrationId, setPlayingSceneNarrationId] = useState<string | null>(null);
 
   const quizScenes = project.scenes.filter((s) => s.sceneType === 'quiz' && s.quizQuestion);
 
@@ -45,6 +51,22 @@ export const InteractivePlayerModal: React.FC<InteractivePlayerModalProps> = ({
     if (optionIndex === correctIndex) {
       setUserScore((prev) => prev + 100);
     }
+  };
+
+  const handlePlaySceneNarration = (scene: Scene) => {
+    if (playingSceneNarrationId === scene.id) {
+      window.speechSynthesis?.cancel();
+      setPlayingSceneNarrationId(null);
+      return;
+    }
+
+    setPlayingSceneNarrationId(scene.id);
+    speakNarrationBrowser(scene.narration, {
+      gender: project.voiceConfig?.gender || 'female',
+      speed: project.voiceConfig?.speed || 1.0,
+      onEnd: () => setPlayingSceneNarrationId(null),
+      onError: () => setPlayingSceneNarrationId(null),
+    });
   };
 
   return (
@@ -76,7 +98,7 @@ export const InteractivePlayerModal: React.FC<InteractivePlayerModalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Mode Pembelajaran Interaktif Siswa
+                Mode Pembelajaran Interaktif Siswa & Penjelasan Materi Lengkap
               </p>
             </div>
           </div>
@@ -109,8 +131,143 @@ export const InteractivePlayerModal: React.FC<InteractivePlayerModalProps> = ({
           />
         </div>
 
-        {/* Interactive Classroom Evaluation & Quiz Hub */}
-        {quizScenes.length > 0 && (
+        {/* Navigation Tabs between Material Explanation & Quiz */}
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+          <button
+            onClick={() => setActiveTab('explanation')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'explanation'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                : 'bg-slate-900 text-slate-400 hover:text-white'
+            }`}
+          >
+            <BookOpen className="h-4 w-4" />
+            <span>📖 Penjelasan & Naskah Materi ({project.scenes.length} Bagian)</span>
+          </button>
+
+          {quizScenes.length > 0 && (
+            <button
+              onClick={() => setActiveTab('quiz')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'quiz'
+                  ? 'bg-pink-600 text-white shadow-md shadow-pink-600/30'
+                  : 'bg-slate-900 text-slate-400 hover:text-white'
+              }`}
+            >
+              <HelpCircle className="h-4 w-4" />
+              <span>❓ Kuis Pemahaman ({quizScenes.length} Soal)</span>
+              {userScore > 0 && (
+                <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px]">
+                  {userScore} Poin
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* TAB 1: Material Explanation & Scene Breakdown */}
+        {activeTab === 'explanation' && (
+          <div className="space-y-4">
+            
+            {/* Full Learning Material Card */}
+            {project.learningMaterial && (
+              <div className="rounded-2xl border border-indigo-500/20 bg-indigo-950/20 p-4 space-y-2">
+                <div className="flex items-center gap-2 text-indigo-300 font-bold text-xs">
+                  <FileText className="h-4 w-4" />
+                  <span>Teks Sumber Materi Pembelajaran Guru:</span>
+                </div>
+                <p className="text-xs leading-relaxed text-slate-300 whitespace-pre-line bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                  {project.learningMaterial}
+                </p>
+              </div>
+            )}
+
+            {/* Scene-by-Scene Explanation Grid */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <Sparkles className="h-4 w-4 text-amber-400" />
+                <span>Runtutan Penjelasan Materi Per Scene:</span>
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {project.scenes.map((sc, idx) => {
+                  const isCurrent = idx === activeSceneIndex;
+                  return (
+                    <div
+                      key={sc.id}
+                      className={`rounded-2xl border p-4 space-y-2.5 transition-all ${
+                        isCurrent
+                          ? 'border-indigo-500 bg-indigo-950/30 shadow-lg shadow-indigo-500/10'
+                          : 'border-slate-800 bg-slate-900/50 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs font-bold ${
+                            isCurrent ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300'
+                          }`}>
+                            {idx + 1}
+                          </span>
+                          <h4 className="text-xs font-bold text-white truncate max-w-[200px]">
+                            {sc.overlayTitle || sc.title}
+                          </h4>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => handlePlaySceneNarration(sc)}
+                            title="Dengarkan Suara Guru"
+                            className={`p-1.5 rounded-lg text-xs font-medium transition-all ${
+                              playingSceneNarrationId === sc.id
+                                ? 'bg-indigo-600 text-white animate-pulse'
+                                : 'bg-slate-800 text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            <Volume2 className="h-3.5 w-3.5" />
+                          </button>
+
+                          <button
+                            onClick={() => setActiveSceneIndex(idx)}
+                            className="text-[10px] font-bold px-2 py-1 rounded-md bg-slate-800 text-indigo-300 hover:bg-slate-700"
+                          >
+                            Lompat ke Scene
+                          </button>
+                        </div>
+                      </div>
+
+                      {sc.overlaySubtitle && (
+                        <p className="text-[11px] text-indigo-300 font-medium">
+                          {sc.overlaySubtitle}
+                        </p>
+                      )}
+
+                      {/* Narration explanation */}
+                      <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
+                        {sc.narration}
+                      </p>
+
+                      {/* Bullet points if any */}
+                      {sc.bulletPoints && sc.bulletPoints.length > 0 && (
+                        <div className="space-y-1 pt-1">
+                          {sc.bulletPoints.map((bp, bIdx) => (
+                            <div key={bIdx} className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                              <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+                              <span>{bp}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 2: Interactive Classroom Evaluation & Quiz Hub */}
+        {activeTab === 'quiz' && quizScenes.length > 0 && (
           <div className="rounded-3xl border border-pink-500/30 bg-gradient-to-br from-pink-950/20 via-slate-900/60 to-indigo-950/20 p-5 space-y-4">
             
             <div className="flex items-center justify-between">

@@ -616,104 +616,156 @@ function drawStandardScene(
 ) {
   ctx.save();
   const startX = width * 0.06;
-  const startY = height * 0.22;
+  const cardMaxW = width * 0.88;
+  let curY = height * 0.16;
 
-  // Animate Title entrance
+  // 1. Pedagogical Category Badge
+  const badgeLabel =
+    scene.sceneType === 'learning_concept'
+      ? '💡 TUJUAN & KONSEP DASAR'
+      : scene.sceneType === 'explanation'
+      ? '📖 PENJELASAN MATERI & TATA CARA'
+      : scene.sceneType === 'example'
+      ? '🔬 CONTOH KASUS & PENERAPAN NYATA'
+      : scene.sceneType === 'summary'
+      ? '✨ RANGKUMAN POIN PENTING'
+      : '📚 MATERI PEMBELAJARAN';
+
+  const badgeAlpha = Math.min(1, sceneTime * 3);
+  ctx.globalAlpha = badgeAlpha;
+
+  ctx.font = `bold ${Math.round(height * 0.02)}px 'Outfit', sans-serif`;
+  const badgeTextW = ctx.measureText(badgeLabel).width;
+  const badgeH = height * 0.038;
+  const badgePadX = 14;
+
+  ctx.fillStyle = 'rgba(79, 70, 229, 0.4)';
+  ctx.beginPath();
+  ctx.roundRect(startX, curY, badgeTextW + badgePadX * 2, badgeH, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#818CF8';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#E0E7FF';
+  ctx.fillText(badgeLabel, startX + badgePadX, curY + badgeH * 0.68);
+
+  curY += badgeH + height * 0.024;
+
+  // 2. Animate Main Title Entrance
   const titleAlpha = Math.min(1, sceneTime * 2);
   ctx.globalAlpha = titleAlpha;
 
   // Overlay Title
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = `bold ${Math.round(height * 0.062)}px 'Outfit', sans-serif`;
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  ctx.font = `bold ${Math.round(height * 0.054)}px 'Outfit', sans-serif`;
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
   ctx.shadowBlur = 12;
   ctx.shadowOffsetX = 2;
   ctx.shadowOffsetY = 2;
 
-  const titleLines = wrapText(ctx, scene.overlayTitle || scene.title, width * 0.88);
-  let curY = startY;
+  const titleLines = wrapText(ctx, scene.overlayTitle || scene.title, cardMaxW);
   titleLines.forEach((line) => {
     ctx.fillText(line, startX, curY);
-    curY += height * 0.075;
+    curY += height * 0.065;
   });
 
-  // Overlay Subtitle / Key Concept
+  // Overlay Subtitle / Key Concept Banner
   if (scene.overlaySubtitle) {
     ctx.fillStyle = '#93C5FD';
-    ctx.font = `600 ${Math.round(height * 0.032)}px 'Plus Jakarta Sans', sans-serif`;
+    ctx.font = `600 ${Math.round(height * 0.028)}px 'Plus Jakarta Sans', sans-serif`;
     ctx.shadowBlur = 8;
-    ctx.fillText(scene.overlaySubtitle, startX, curY + 4);
-    curY += height * 0.055;
-  }
-
-  // Bullet Points Cards
-  if (scene.bulletPoints && scene.bulletPoints.length > 0) {
-    curY += height * 0.025;
-    scene.bulletPoints.forEach((point, idx) => {
-      const pointTime = 1.0 + idx * 0.8;
-      if (sceneTime >= pointTime) {
-        const pointAlpha = Math.min(1, (sceneTime - pointTime) * 2);
-        ctx.globalAlpha = pointAlpha;
-
-        const cardH = height * 0.065;
-        const cardW = width * 0.82;
-        const cardY = curY;
-
-        // Card Backdrop
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        ctx.shadowBlur = 8;
-        ctx.beginPath();
-        ctx.roundRect(startX, cardY, cardW, cardH, 10);
-        ctx.fill();
-
-        ctx.strokeStyle = idx === 0 ? '#6366F1' : '#38BDF8';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Icon Pill
-        ctx.fillStyle = idx === 0 ? '#6366F1' : '#0284C7';
-        ctx.beginPath();
-        ctx.arc(startX + height * 0.032, cardY + cardH / 2, height * 0.018, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = `bold ${Math.round(height * 0.022)}px 'Outfit', sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.fillText(`${idx + 1}`, startX + height * 0.032, cardY + cardH / 2 + height * 0.007);
-        ctx.textAlign = 'left';
-
-        // Bullet Text
-        ctx.fillStyle = '#F8FAFC';
-        ctx.font = `500 ${Math.round(height * 0.026)}px 'Plus Jakarta Sans', sans-serif`;
-        ctx.fillText(point, startX + height * 0.065, cardY + cardH / 2 + height * 0.008);
-
-        curY += cardH + height * 0.018;
-      }
+    const subLines = wrapText(ctx, scene.overlaySubtitle, cardMaxW);
+    subLines.forEach((line) => {
+      ctx.fillText(line, startX, curY);
+      curY += height * 0.042;
     });
   }
 
-  // Keywords Badge Row
-  if (scene.keywords && scene.keywords.length > 0 && sceneTime >= 2.0) {
+  // 3. Bullet Points & Material Explanation Cards
+  const points = (scene.bulletPoints && scene.bulletPoints.length > 0)
+    ? scene.bulletPoints
+    : [
+        scene.narration ? (scene.narration.length > 85 ? scene.narration.slice(0, 82) + '...' : scene.narration) : 'Simak materi pembelajaran dengan saksama.',
+        'Pahami konsep dan penerapannya dalam kehidupan.'
+      ];
+
+  curY += height * 0.015;
+  points.forEach((point, idx) => {
+    const pointTime = 0.8 + idx * 0.7;
+    if (sceneTime >= pointTime) {
+      const pointAlpha = Math.min(1, (sceneTime - pointTime) * 2.5);
+      ctx.globalAlpha = pointAlpha;
+
+      ctx.font = `500 ${Math.round(height * 0.026)}px 'Plus Jakarta Sans', sans-serif`;
+      const textWrapW = cardMaxW - height * 0.09;
+      const wrappedLines = wrapText(ctx, point, textWrapW);
+      const cardH = Math.max(height * 0.065, height * 0.035 + wrappedLines.length * (height * 0.032));
+      const cardY = curY;
+
+      // Card Backdrop Glassmorphism
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.86)';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.roundRect(startX, cardY, cardMaxW, cardH, 12);
+      ctx.fill();
+
+      const borderColors = ['#6366F1', '#38BDF8', '#10B981', '#F59E0B'];
+      ctx.strokeStyle = borderColors[idx % borderColors.length];
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Icon Number Badge
+      const iconRadius = height * 0.018;
+      const iconCenterX = startX + height * 0.034;
+      const iconCenterY = cardY + cardH / 2;
+
+      ctx.fillStyle = borderColors[idx % borderColors.length];
+      ctx.beginPath();
+      ctx.arc(iconCenterX, iconCenterY, iconRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `bold ${Math.round(height * 0.02)}px 'Outfit', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(`${idx + 1}`, iconCenterX, iconCenterY + height * 0.007);
+      ctx.textAlign = 'left';
+
+      // Multiline Bullet Text
+      ctx.fillStyle = '#F8FAFC';
+      ctx.font = `500 ${Math.round(height * 0.025)}px 'Plus Jakarta Sans', sans-serif`;
+      let textLineY = cardY + (cardH - (wrappedLines.length - 1) * height * 0.032) / 2 + height * 0.008;
+      wrappedLines.forEach((tLine) => {
+        ctx.fillText(tLine, startX + height * 0.065, textLineY);
+        textLineY += height * 0.032;
+      });
+
+      curY += cardH + height * 0.014;
+    }
+  });
+
+  // 4. Keywords Badge Row
+  if (scene.keywords && scene.keywords.length > 0 && sceneTime >= 1.8) {
     let kwX = startX;
-    const kwY = height * 0.72;
-    ctx.globalAlpha = Math.min(1, (sceneTime - 2.0) * 2);
+    const kwY = height * 0.73;
+    ctx.globalAlpha = Math.min(1, (sceneTime - 1.8) * 2);
 
     scene.keywords.slice(0, 4).forEach((kw) => {
-      ctx.font = `600 ${Math.round(height * 0.02)}px 'Plus Jakarta Sans', sans-serif`;
+      ctx.font = `600 ${Math.round(height * 0.019)}px 'Plus Jakarta Sans', sans-serif`;
       const kwWidth = ctx.measureText(`# ${kw}`).width;
-      const padX = 14;
+      const padX = 12;
 
-      ctx.fillStyle = 'rgba(99, 102, 241, 0.25)';
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.3)';
       ctx.beginPath();
-      ctx.roundRect(kwX, kwY, kwWidth + padX * 2, height * 0.038, 20);
+      ctx.roundRect(kwX, kwY, kwWidth + padX * 2, height * 0.036, 18);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(129, 140, 248, 0.6)';
+      ctx.strokeStyle = 'rgba(165, 180, 252, 0.7)';
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      ctx.fillStyle = '#C7D2FE';
-      ctx.fillText(`# ${kw}`, kwX + padX, kwY + height * 0.025);
+      ctx.fillStyle = '#E0E7FF';
+      ctx.fillText(`# ${kw}`, kwX + padX, kwY + height * 0.024);
 
       kwX += kwWidth + padX * 2 + 10;
     });
