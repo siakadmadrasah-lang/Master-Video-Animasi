@@ -37,6 +37,29 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
   const fullDevName = 'Dev Jaenal Maskun';
   const [typedName, setTypedName] = useState('');
   const [isWriting, setIsWriting] = useState(true);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  // Auto-hide when typing into any input/textarea to never block mobile forms
+  useEffect(() => {
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+        setIsKeyboardOpen(true);
+      }
+    };
+
+    const handleFocusOut = () => {
+      setIsKeyboardOpen(false);
+    };
+
+    window.addEventListener('focusin', handleFocusIn);
+    window.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      window.removeEventListener('focusin', handleFocusIn);
+      window.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
 
   useEffect(() => {
     let charIndex = 0;
@@ -79,6 +102,10 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
       if (timer) clearTimeout(timer);
     };
   }, []);
+
+  if (isKeyboardOpen) {
+    return null;
+  }
 
   return (
     <footer className="sticky bottom-0 z-40 w-full transition-all duration-300 pointer-events-none">

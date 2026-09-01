@@ -460,20 +460,22 @@ export function App() {
 
       </div>
 
-      {/* Iconic Modern Sticky Footer */}
-      <StickyFooter
-        onQuickCreate={handleCreateNew}
-        onOpenAdminLogin={() => {
-          if (adminUser) {
-            setActiveTab('admin');
-          } else {
-            setIsAdminLoginOpen(true);
-          }
-        }}
-        adminUser={adminUser}
-        totalProjects={projects.length}
-        hasApiKey={hasApiKey}
-      />
+      {/* Iconic Modern Sticky Footer (Only shown on Overview / Gallery to avoid blocking inputs & forms) */}
+      {(activeTab === 'dashboard' || activeTab === 'videos') && !isAdminLoginOpen && !playerProject && !exportModalProject && !isAuthModalOpen && (
+        <StickyFooter
+          onQuickCreate={handleCreateNew}
+          onOpenAdminLogin={() => {
+            if (adminUser) {
+              setActiveTab('admin');
+            } else {
+              setIsAdminLoginOpen(true);
+            }
+          }}
+          adminUser={adminUser}
+          totalProjects={projects.length}
+          hasApiKey={hasApiKey}
+        />
+      )}
 
       {/* Admin Login Modal */}
       {isAdminLoginOpen && (

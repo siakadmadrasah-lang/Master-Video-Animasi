@@ -432,7 +432,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6 pb-32 sm:pb-16">
       
       {/* Wizard Header */}
       <div className="flex items-center justify-between">
