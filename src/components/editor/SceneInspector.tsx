@@ -48,6 +48,31 @@ export const SceneInspector: React.FC<SceneInspectorProps> = ({
   // Educational Preset Images Curated by Subject
   const PRESET_VISUALS = [
     {
+      name: 'Masjid & Kubah Agung',
+      url: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1200&auto=format&fit=crop&q=80',
+      category: 'Fikih & Islam',
+    },
+    {
+      name: 'Kitab Suci Al-Qur\'an & Rehal',
+      url: 'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80',
+      category: 'Fikih & Islam',
+    },
+    {
+      name: 'Kajian & Bacaan Fikih',
+      url: 'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1200&auto=format&fit=crop&q=80',
+      category: 'Fikih & Islam',
+    },
+    {
+      name: 'Pelataran & Pilar Masjid',
+      url: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1200&auto=format&fit=crop&q=80',
+      category: 'Fikih & Islam',
+    },
+    {
+      name: 'Santri Ceria Madrasah',
+      url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&auto=format&fit=crop&q=80',
+      category: 'Kelas & Santri',
+    },
+    {
       name: 'Laboratorium & Sel Biologi',
       url: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&auto=format&fit=crop&q=80',
       category: 'Biologi',

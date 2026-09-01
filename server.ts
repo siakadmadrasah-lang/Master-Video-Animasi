@@ -139,18 +139,19 @@ const TOPIC_SPECIFIC_VISUALS: { keywords: string[]; urls: string[] }[] = [
   {
     keywords: ['khitan', 'sirkumsisi', 'sunat', 'fikih khitan', 'thaharah'],
     urls: [
-      'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1200&auto=format&fit=crop&q=80', // Islamic architecture dome & lights
+      'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1200&auto=format&fit=crop&q=80', // Mosque & Islamic dome
       'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1200&auto=format&fit=crop&q=80', // Quran with warm light
+      'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80', // Holy book & Rehal
       'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1200&auto=format&fit=crop&q=80', // Mosque courtyard
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop&q=80', // Islamic calligraphy and book
-      'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80', // Holy book and warm prayer lights
+      'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&auto=format&fit=crop&q=80', // Madrasah school
     ],
   },
   {
     keywords: ['wudhu', 'berwudhu', 'bersuci', 'thoharoh', 'air suci'],
     urls: [
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1200&auto=format&fit=crop&q=80',
     ],
   },
@@ -159,7 +160,8 @@ const TOPIC_SPECIFIC_VISUALS: { keywords: string[]; urls: string[] }[] = [
     urls: [
       'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1200&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1200&auto=format&fit=crop&q=80',
     ],
   },
   {
@@ -224,7 +226,7 @@ const THEMATIC_VISUALS: Record<string, string[]> = {
   "Al-Qur'an Hadis": [
     'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1200&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1200&auto=format&fit=crop&q=80',
   ],
   "Akidah Akhlak": [
     'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1200&auto=format&fit=crop&q=80',
@@ -234,7 +236,8 @@ const THEMATIC_VISUALS: Record<string, string[]> = {
   Fikih: [
     'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1200&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1200&auto=format&fit=crop&q=80',
   ],
   SKI: [
     'https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&auto=format&fit=crop&q=80',
@@ -244,7 +247,7 @@ const THEMATIC_VISUALS: Record<string, string[]> = {
   "Bahasa Arab": [
     'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1200&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1200&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1200&auto=format&fit=crop&q=80',
   ],
   IPAS: [
     'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&auto=format&fit=crop&q=80',

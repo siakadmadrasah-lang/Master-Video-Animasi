@@ -31,6 +31,106 @@ interface VideoGeneratorWizardProps {
   } | null;
 }
 
+function getThematicVisualUrl(subject: string, topic: string, sceneIndex: number): string {
+  const combined = `${subject} ${topic}`.toLowerCase();
+
+  // Khitan / Sirkumsisi / Fikih Khitan
+  if (combined.includes('khitan') || combined.includes('sirkumsisi') || combined.includes('sunat')) {
+    const khitanImages = [
+      'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1280&q=80', // Mosque & Islamic architecture
+      'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1280&q=80', // Holy Book / Islamic study
+      'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1280&q=80', // Quran with warm light
+      'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1280&q=80', // Mosque courtyard & pillars
+      'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1280&q=80', // Madrasah classroom
+      'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80', // Quiz card
+      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1280&q=80', // Santri / happy students
+    ];
+    return khitanImages[sceneIndex % khitanImages.length];
+  }
+
+  // Wudhu / Shalat / Fikih Ibadah / Thaharah
+  if (combined.includes('wudhu') || combined.includes('shalat') || combined.includes('sholat') || combined.includes('fikih') || combined.includes('thaharah') || combined.includes('ibadah')) {
+    const fikihImages = [
+      'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1280&q=80',
+      'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1280&q=80',
+      'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1280&q=80',
+      'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1280&q=80',
+      'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1280&q=80',
+    ];
+    return fikihImages[sceneIndex % fikihImages.length];
+  }
+
+  // Al-Qur'an Hadis / Akidah Akhlak / SKI / Bahasa Arab
+  if (combined.includes('quran') || combined.includes('hadis') || combined.includes('akidah') || combined.includes('akhlak') || combined.includes('ski') || combined.includes('arab')) {
+    const islamicImages = [
+      'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1280&q=80',
+      'https://images.unsplash.com/photo-1584286595398-a59f21d313f5?w=1280&q=80',
+      'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1280&q=80',
+      'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=1280&q=80',
+      'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1280&q=80',
+    ];
+    return islamicImages[sceneIndex % islamicImages.length];
+  }
+
+  // Biologi / IPAS / Fotosintesis / Tumbuhan / Ekosistem
+  if (combined.includes('foto') || combined.includes('daun') || combined.includes('tumbuhan') || combined.includes('sel') || combined.includes('biologi') || combined.includes('ipas')) {
+    const bioImages = [
+      'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=1280&q=80',
+      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1280&q=80',
+      'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1280&q=80',
+      'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=1280&q=80',
+      'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1280&q=80',
+    ];
+    return bioImages[sceneIndex % bioImages.length];
+  }
+
+  // Fisika / Newton / Gaya / Tata Surya / Astronomi
+  if (combined.includes('fisika') || combined.includes('newton') || combined.includes('tata surya') || combined.includes('planet') || combined.includes('angkasa') || combined.includes('gaya')) {
+    const physicsImages = [
+      'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?w=1280&q=80',
+      'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=1280&q=80',
+      'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1280&q=80',
+      'https://images.unsplash.com/photo-1517976487507-5b07432f93d6?w=1280&q=80',
+      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1280&q=80',
+      'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=1280&q=80',
+    ];
+    return physicsImages[sceneIndex % physicsImages.length];
+  }
+
+  // AI / Informatika / Komputer
+  if (combined.includes('ai') || combined.includes('komputer') || combined.includes('informatika') || combined.includes('coding') || combined.includes('machine learning')) {
+    const aiImages = [
+      'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=1280&q=80',
+      'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1280&q=80',
+      'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1280&q=80',
+      'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=1280&q=80',
+      'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1280&q=80',
+      'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80',
+      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1280&q=80',
+    ];
+    return aiImages[sceneIndex % aiImages.length];
+  }
+
+  // Default General Educational
+  const defaultImages = [
+    'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1280&q=80',
+    'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=1280&q=80',
+    'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1280&q=80',
+    'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=1280&q=80',
+    'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1280&q=80',
+    'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80',
+    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1280&q=80',
+  ];
+  return defaultImages[sceneIndex % defaultImages.length];
+}
+
 export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
   onCancel,
   onGenerationComplete,
@@ -396,7 +496,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           status: 'ready',
-          thumbnailUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80',
+          thumbnailUrl: getThematicVisualUrl(subject, title, 0),
           totalDurationSeconds,
           voiceConfig: {
             provider: 'browser',
@@ -442,7 +542,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
               overlayTitle: title,
               overlaySubtitle: `${subject} • ${grade}`,
               visualPrompt: `Pemandangan ruang kelas ceria madrasah dengan papan tulis bercahaya lembut menampilkan judul ${title}`,
-              visualUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1280&q=80',
+              visualUrl: getThematicVisualUrl(subject, title, 0),
               visualType: 'image',
               bgGradient: 'from-emerald-600 to-teal-800',
               animationType: 'zoom-in',
@@ -460,7 +560,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
               overlayTitle: 'Konsep Dasar',
               overlaySubtitle: 'Pondasi Pembelajaran',
               visualPrompt: `Diagram edukatif warna-warni menjelaskan konsep dasar materi ${title}`,
-              visualUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1280&q=80',
+              visualUrl: getThematicVisualUrl(subject, title, 1),
               visualType: 'diagram',
               bgGradient: 'from-blue-600 to-indigo-900',
               animationType: 'pan-left',
@@ -478,7 +578,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
               overlayTitle: 'Ulasan Detail',
               overlaySubtitle: 'Tahapan Penting',
               visualPrompt: `Ilustrasi mendalam bertingkat menjelaskan detail materi ${title}`,
-              visualUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1280&q=80',
+              visualUrl: getThematicVisualUrl(subject, title, 2),
               visualType: 'image',
               bgGradient: 'from-purple-600 to-indigo-900',
               animationType: 'pan-right',
@@ -496,7 +596,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
               overlayTitle: 'Contoh Praktis',
               overlaySubtitle: 'Penerapan Nyata',
               visualPrompt: `Contoh konkret penerapan materi ${title} di madrasah atau lingkungan rumah`,
-              visualUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1280&q=80',
+              visualUrl: getThematicVisualUrl(subject, title, 3),
               visualType: 'image',
               bgGradient: 'from-amber-600 to-orange-800',
               animationType: 'zoom-in',
@@ -514,7 +614,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
               overlayTitle: 'Rangkuman Materi',
               overlaySubtitle: 'Poin Kunci Pembelajaran',
               visualPrompt: `Kartu rangkuman bergaya islami modern dengan butir-butir kesimpulan materi`,
-              visualUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1280&q=80',
+              visualUrl: getThematicVisualUrl(subject, title, 4),
               visualType: 'image',
               bgGradient: 'from-emerald-700 to-teal-900',
               animationType: 'zoom-in',
@@ -532,7 +632,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
               overlayTitle: 'Uji Pemahaman',
               overlaySubtitle: 'Kuis Interaktif',
               visualPrompt: `Papan kuis interaktif dengan pilihan jawaban ganda A, B, C, D yang dinamis`,
-              visualUrl: 'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1280&q=80',
+              visualUrl: getThematicVisualUrl(subject, title, 5),
               visualType: 'quiz_card',
               bgGradient: 'from-indigo-800 to-slate-900',
               animationType: 'none',
@@ -561,7 +661,7 @@ export const VideoGeneratorWizard: React.FC<VideoGeneratorWizardProps> = ({
               overlayTitle: 'Terima Kasih!',
               overlaySubtitle: 'Madrasah Hebat Bermartabat',
               visualPrompt: `Layar penutup indah dengan logo madrasah, bintang-bintang bercahaya, dan pesan motivasi`,
-              visualUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1280&q=80',
+              visualUrl: getThematicVisualUrl(subject, title, 6),
               visualType: 'image',
               bgGradient: 'from-sky-700 to-blue-900',
               animationType: 'zoom-in',
