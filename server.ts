@@ -382,6 +382,41 @@ async function startServer() {
     res.json({ success: true, message: 'Proyek video berhasil dihapus.' });
   });
 
+  // Duplicate Project Endpoint
+  app.post('/api/projects/:id/duplicate', (req: Request, res: Response) => {
+    const original = projectsDatabase.find((p) => p.id === req.params.id);
+    if (!original) {
+      return res.status(404).json({ error: 'Proyek video asal tidak ditemukan.' });
+    }
+    const duplicated: VideoProject = {
+      ...JSON.parse(JSON.stringify(original)),
+      id: `proj-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
+      title: `${original.title} (Salinan)`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    projectsDatabase.unshift(duplicated);
+    res.status(201).json(duplicated);
+  });
+
+  // Project Render Endpoint
+  app.post('/api/projects/:id/render', (req: Request, res: Response) => {
+    const project = projectsDatabase.find((p) => p.id === req.params.id);
+    if (!project) {
+      return res.status(404).json({ error: 'Proyek video tidak ditemukan.' });
+    }
+    const { resolution = '1080p', fps = 30 } = req.body || {};
+    project.status = 'ready';
+    project.updatedAt = new Date().toISOString();
+    res.json({
+      success: true,
+      jobId: `job-${Date.now()}`,
+      status: 'ready',
+      message: `Video "${project.title}" berhasil diperbarui status rendernya.`,
+      project,
+    });
+  });
+
   // AI Learning Material Generator Endpoint (Otomatis Generate Materi Ajar)
   app.post('/api/ai/generate-material', async (req: Request, res: Response) => {
     try {
@@ -785,10 +820,10 @@ Format output WAJIB HANYA kode XML SVG murni tanpa markdown pembungkus: <svg ...
     }
   });
 
-  // AI Refine Narration Endpoint
-  app.post('/api/ai/refine-narration', async (req: Request, res: Response) => {
+  // AI Refine / Enhance Narration Endpoint
+  const handleNarrationRefinement = async (req: Request, res: Response) => {
     try {
-      const { narration, tone = 'ramah', grade = 'SMP', title = '' } = req.body;
+      const { narration, tone = 'ramah', grade = 'SMP', title = '', subject = '' } = req.body;
       if (!narration) {
         return res.status(400).json({ error: 'Teks narasi diperlukan.' });
       }
@@ -797,7 +832,7 @@ Format output WAJIB HANYA kode XML SVG murni tanpa markdown pembungkus: <svg ...
       if (process.env.GEMINI_API_KEY) {
         try {
           refinedText = await generateGeminiContentWithRetry({
-            contents: `Kamu adalah asisten naskah guru. Sempurnakan teks narasi video pembelajaran berikut untuk jenjang ${grade}, topik "${title}", dengan nada "${tone}" agar lebih memikat, ringkas, dan mudah dipahami dalam Bahasa Indonesia:
+            contents: `Kamu adalah asisten naskah guru ${subject}. Sempurnakan teks narasi video pembelajaran berikut untuk jenjang ${grade}, topik "${title}", dengan nada "${tone}" agar lebih memikat, ringkas, dan mudah dipahami dalam Bahasa Indonesia:
 "${narration}"
 
 Berikan HANYA teks narasi hasil perbaikan tanpa tanda kutip atau penjelasan tambahan.`,
@@ -808,11 +843,18 @@ Berikan HANYA teks narasi hasil perbaikan tanpa tanda kutip atau penjelasan tamb
         }
       }
 
-      res.json({ refinedNarration: refinedText?.trim() || narration });
+      const finalText = refinedText?.trim() || narration;
+      res.json({
+        refinedNarration: finalText,
+        enhancedNarration: finalText,
+      });
     } catch (err: any) {
       res.status(500).json({ error: 'Gagal memperbarui narasi: ' + err.message });
     }
-  });
+  };
+
+  app.post('/api/ai/refine-narration', handleNarrationRefinement);
+  app.post('/api/ai/enhance-narration', handleNarrationRefinement);
 
   // AI Generate Quiz Questions
   app.post('/api/ai/generate-quiz', async (req: Request, res: Response) => {
