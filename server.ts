@@ -69,11 +69,13 @@ async function generateGeminiContentWithRetry(options: {
   }
 
   const client = getGeminiClient();
+  // Modern valid Gemini models according to @google/genai guidelines:
+  // gemini-3.7-flash (default text), gemini-3.1-flash-lite (fast/resilient), gemini-flash-latest, gemini-3.1-pro-preview
   const models = options.candidateModels && options.candidateModels.length > 0
     ? options.candidateModels
-    : ['gemini-3.7-flash', 'gemini-2.5-flash', 'gemini-flash-latest'];
+    : ['gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.1-pro-preview'];
 
-  const maxRetries = options.maxRetriesPerModel ?? 2;
+  const maxRetries = options.maxRetriesPerModel ?? 3;
 
   for (const model of models) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -106,7 +108,7 @@ async function generateGeminiContentWithRetry(options: {
           errMsg.includes('fetch failed');
 
         if (isTransient && attempt < maxRetries) {
-          const delayMs = attempt * 600 + Math.floor(Math.random() * 300);
+          const delayMs = attempt * 800 + Math.floor(Math.random() * 400);
           console.warn(`[Gemini API] ${model} transient busy (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms...`);
           await new Promise((resolve) => setTimeout(resolve, delayMs));
           continue;
@@ -438,7 +440,7 @@ Format Output WAJIB berupa JSON Object valid:
             contents: prompt,
             responseMimeType: 'application/json',
             temperature: 0.7,
-            candidateModels: ['gemini-3.7-flash', 'gemini-2.5-flash', 'gemini-flash-latest'],
+            candidateModels: ['gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.1-pro-preview'],
           });
         } catch (aiErr) {
           console.warn('Gemini generate-material fallback activated:', aiErr);
@@ -555,7 +557,7 @@ ${learningMaterial}
             systemInstruction,
             responseMimeType: 'application/json',
             temperature: 0.7,
-            candidateModels: ['gemini-3.7-flash', 'gemini-2.5-flash', 'gemini-flash-latest'],
+            candidateModels: ['gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.1-pro-preview'],
           });
         } catch (aiError) {
           console.warn('Gemini API call fallback to smart educational template engine:', aiError);
@@ -696,7 +698,7 @@ Format output WAJIB HANYA kode XML SVG murni tanpa markdown pembungkus: <svg ...
           
           const svgText: string | null = await generateGeminiContentWithRetry({
             contents: svgPrompt,
-            candidateModels: ['gemini-3.7-flash', 'gemini-2.5-flash', 'gemini-flash-latest'],
+            candidateModels: ['gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.1-pro-preview'],
           });
 
           if (svgText && svgText.includes('<svg')) {
@@ -794,7 +796,7 @@ Format output WAJIB HANYA kode XML SVG murni tanpa markdown pembungkus: <svg ...
 "${narration}"
 
 Berikan HANYA teks narasi hasil perbaikan tanpa tanda kutip atau penjelasan tambahan.`,
-            candidateModels: ['gemini-3.7-flash', 'gemini-2.5-flash', 'gemini-flash-latest'],
+            candidateModels: ['gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.1-pro-preview'],
           });
         } catch (aiErr) {
           console.warn('Gemini refine narration fallback:', aiErr);
@@ -827,7 +829,7 @@ Format output JSON:
   }
 ]`,
             responseMimeType: 'application/json',
-            candidateModels: ['gemini-3.7-flash', 'gemini-2.5-flash', 'gemini-flash-latest'],
+            candidateModels: ['gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.1-pro-preview'],
           });
         } catch (aiErr) {
           console.warn('Gemini quiz generator fallback:', aiErr);
